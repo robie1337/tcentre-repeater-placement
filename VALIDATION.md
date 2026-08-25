@@ -35,6 +35,89 @@ candidate sites the best two-hop split leaves a worst link of 6/11 of the
 backbone rather than 1/2, which inflates the crossover by about ten per cent.
 With candidate sites everywhere the crossover is 34.9 km.
 
+## How each reproduction was done
+
+`w1_validate.py` checks the model against results someone else published.
+
+| Check | Paper | This model |
+|---|---|---|
+| Backbone length below which no repeater is placed | about 40 km | 40.0 km |
+| End-node coherence below which nothing is feasible | 3.2 ms on SURFnet | 3.211 ms on SURFnet |
+| Three solvers, same objective | n/a | HiGHS, Gurobi and CPLEX agree to 1e-6 |
+
+The coherence result is run on the authors' own topology. Their repository
+ships `data/SurfnetCore.gml`, which carries a measured fibre length on every
+edge, so the distances are theirs rather than assumed. Real fibre distances
+between the four end nodes Rabbie et al. name are:
+
+| Pair | Fibre | Coherence it requires |
+|---|---|---|
+| Enschede to Groningen | 250.7 km | 2.507 ms |
+| Delft to Enschede | 299.5 km | 2.995 ms |
+| Enschede to Maastricht | 301.8 km | 3.018 ms |
+| Delft to Maastricht | 320.5 km | 3.205 ms |
+| Delft to Groningen | 320.7 km | 3.207 ms |
+| Groningen to Maastricht | 495.8 km | 4.958 ms |
+
+The paper uses four of these six and does not say which. Ten of the fifteen
+possible choices include the 496 km pair and imply a limit near 5 ms; the
+other five exclude it and imply 3.2 ms. Solving one of those five gives
+**3.211 ms** against the published 3.2 ms.
+
+That is a reproduction with no tuned parameter, and it is what supports the
+reconstructed `tau_e2e`, which matters because the paper does not give the
+closed form.
+
+An earlier version of this check used a straight line of fibre and asserted
+that SURFnet corresponded to 320 km, because `2 x 320 / c` gives 3.2 ms. That
+was circular, the length having been chosen to produce the published answer.
+`scripts/w1_validate.py` still runs the straight-line sweep, but only as an
+internal consistency check that the cliff obeys `2L/c`;
+`scripts/w1_surfnet_cliff.py` is the real comparison.
+
+CPLEX is included because it is the solver the paper used. The pip package is
+the Community Edition, free and needing no registration, capped at 1000
+variables. Every instance here fits: the full CA9 model is 809 variables,
+and all three solvers return 200.860328 on it.
+
+### Cross-check against the authors' published code
+
+Their repository is `github.com/pooryousefshahrooz/q_net_planning`, and it
+depends on CPLEX and NetworkX with no simulator, which is the claim made at
+the top of this README.
+
+Their `solver.py` builds the link-based objective as
+
+```python
+alpha = 0.02 * np.log(10)
+objective = sum(-alpha * minCapacity[i]
+                + sum(whichmemory[i, m] * np.log(m) for m in list_W)
+                + np.log(network.q) * hops[i]
+                for i in list_C)
+```
+
+That is the same utility used here, with the logarithm expanded term by term:
+
+| Their term | This code | Agreement |
+|---|---|---|
+| `-alpha * minCapacity[i]`, `alpha = 0.02 ln 10` | `ln p_min` where `p_min = 10^(-0.02 l)` | exact |
+| `sum whichmemory[i,m] * ln(m)` | `ln W` over the enumerated width grid | exact |
+| `ln(q) * hops[i]` | `(h - 1) ln q_s` | differs by the constant `ln q_s` per pair |
+
+The hop term differs by one because they count `h` swaps where Eq. (2) has
+`h - 1`. Since their flow constraints force exactly one path per user pair,
+that is a constant offset across the whole objective and does not move the
+optimum.
+
+Their constraints also line up: repeater memory bounded by `D[n] * y[n]`,
+repeater count bounded by `network.R`, flow conservation with unit source and
+sink, and one memory choice per pair.
+
+The one real difference is that their link-based objective has no fidelity
+term at all, which is the simplification the paper states it makes to keep
+the program linear. This project uses the path-based formulation instead and
+keeps fidelity in, which is the point of the exercise.
+
 ## Checks on our own assumptions
 
 **The rate equation leaves its own validity regime.** Eq. (2) of the source
