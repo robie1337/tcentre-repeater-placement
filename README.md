@@ -1,94 +1,35 @@
-# Repeater placement for silicon T centres on a continental fibre network
+# Repeater placement for silicon T centres
 
-Quantum repeaters are expensive and you cannot put one everywhere. Given a
-real fibre network and a real qubit technology, where do they go, and how
-does that answer move as the technology improves?
+Where do you put quantum repeaters on a real fibre network, and how does that
+answer move as the hardware improves? This reproduces the placement MIP of
+Pouryousef et al. (IEEE TQE 2024, arXiv:2308.16264v3), swaps in silicon
+T centre hardware, and reports what breaks.
 
-This repository answers that for the silicon T centre, a spin qubit that
-emits at 1326 nm. It reproduces a published placement model, moves it to the
-T centre's wavelength, and reports what breaks.
+The objective and constraints are theirs, unchanged. What changes is the
+wavelength: T centres emit at 1326 nm, where fibre loses 0.35 dB/km instead
+of the 0.2 the paper assumes at 1550 nm. Link fidelity, swap success and
+coherence time are swept rather than fixed, across ranges bracketed by
+published measurements.
 
-## The short version
+The main result is a failure of transfer. Eq. (2) is stated to hold where
+`W * p_min >> 1`; at 1326 nm it never does, median 0.033 over 5,286 solves.
+Reaching the stated regime needs ~631 memories per node against ~40 at
+1550 nm. The paper uses 100. The same 16x loss penalty shows up at the other
+end of the distance axis too: repeaters start paying off at 22 km, not 38.
 
-The main result is a failure of transfer, not a success. The placement model
-being reproduced carries an assumption about memory count that holds at
-1550 nm and fails at 1326 nm by more than an order of magnitude. Its rate
-equation is stated to be valid when `W * p_min >> 1`. At the T centre's
-wavelength that quantity has a median of 0.033 across every solve run here,
-and reaching the stated regime needs roughly 631 memories per node instead of
-the 40 the original setting implies. The paper uses 100.
+Coherence time dominates every outcome measured, but on this geography that
+is a statement about Canada rather than about T centres. The longest route is
+1600 km, light needs 8 ms each way, so nothing matters until a memory
+survives 16.6 ms.
 
-Everything else in the study follows from the same cause, which is that
-O band fibre loses 0.35 dB/km where C band fibre loses 0.2. Over an 80 km
-hop that is about sixteen times the loss. Read from the long end of the
-distance axis it means the network needs far more multiplexing than the
-literature assumes. Read from the short end it means repeaters start paying
-for themselves at 22 km instead of 38.
+Runs use CA9, a nine-city Canadian long-haul topology, 4,810 km of fibre, 53
+candidate sites at 80 km spacing, 18 demand pairs. Route distances are real.
+The operator does not publish PoP locations, so sites sit at uniform spacing
+along each corridor.
 
-A secondary result is about which hardware parameter to fund. Across the
-published parameter ranges, memory coherence time explains most of the
-variance in every outcome measured, and it wins in every configuration
-tested. On a network this size the reason is geography rather than physics:
-light takes 8 ms to cross the country each way, so any protocol that waits
-for an acknowledgement needs 16.6 ms of memory before anything else matters.
-
-## Reading this repository
-
-| If you want | Read |
-|---|---|
-| The problem, stated precisely, with success criteria | [PROBLEM.md](PROBLEM.md) |
-| What was checked and what turned out to be wrong | [VALIDATION.md](VALIDATION.md) |
-| Every result with its numbers and its caveats | [FINDINGS.md](FINDINGS.md) |
-| The code, how to install and run it | this file, below |
-
-## Background for readers from adjacent fields
-
-Entanglement cannot be amplified or copied, and photons in fibre are lost
-exponentially with distance. A direct link therefore stops working after a
-few hundred kilometres. Repeaters fix this by splitting a long path into
-short hops, entangling each hop separately, and then splicing the hops
-together with an operation called entanglement swapping. Each swap succeeds
-with some probability and degrades the state a little.
-
-That gives the placement problem its shape. More repeaters mean shorter hops
-and better photon survival, but also more swaps, which cost success
-probability and fidelity. Somewhere in between is an optimum, and where it
-sits depends on the hardware.
-
-Four hardware numbers drive it here:
-
-- attenuation, how fast photons are lost per kilometre of fibre
-- link fidelity, how good a freshly entangled hop is
-- swap success, how often the splicing operation works
-- coherence time, how long a memory holds a qubit before it decays
-
-The first is fixed by the emitter's wavelength. The other three are still
-moving, which is why this study sweeps them rather than picking values.
-
-## The network
-
-Runs use CA9, a nine-city Canadian long-haul topology with 4,810 km of fibre,
-53 candidate repeater sites at 80 km spacing, and 18 city pairs to serve. The
-intercity distances are real route distances. The operator does not publish
-point-of-presence locations, so candidate sites sit at uniform spacing along
-each corridor rather than at named facilities.
-
-Two properties of CA9 matter for the results. The longest route is about
-1600 km, which sets the latency floor that makes coherence time dominate. The
-western and eastern halves are roughly 2000 km apart with no city in between
-in this node set, so the graph has two components and demand is 18 pairs
-within them.
-
-## What this is
-
-The placement model is the mixed integer program from Pouryousef et al.,
-"Resource Placement for Rate and Fidelity Maximization in Quantum Networks",
-IEEE Transactions on Quantum Engineering 2024, arXiv:2308.16264v3. The
-objective and constraint structure are theirs. What changes is the hardware:
-fibre attenuation moves from the C band value of 0.2 dB/km to the T centre's
-O band value of 0.35 dB/km at 1326 nm, and link fidelity, swap success and
-coherence time are swept across the range published T centre measurements and
-projections span.
+[PROBLEM.md](PROBLEM.md) states the problem and what counts as an answer.
+[VALIDATION.md](VALIDATION.md) has every check and every error found,
+including this project's own. [FINDINGS.md](FINDINGS.md) has the results.
 
 ## There is no network simulator here, and that is deliberate
 
@@ -415,20 +356,12 @@ infeasibility cliff, keep the requirement on.
 Every bound is bracketed by a published measurement on some platform, so none
 of the ranges are invented.
 
-## Provenance and AI assistance
+## Attribution
 
-This is undergraduate research, and the repository is written so that the
-process can be audited rather than taken on trust. [PROBLEM.md](PROBLEM.md)
-records the task as it was originally specified.
-[VALIDATION.md](VALIDATION.md) records every check run against the source
-paper, and every error found in this project's own inputs, including the ones
-that survived for months before anyone caught them.
-
-Claude (Anthropic) was used for code review, literature cross-checking, and
-drafting. Every number reported here comes from code in this repository that
-anyone can run. The citation audit described in VALIDATION.md was carried out
-against arXiv primary sources, and it found six wrong attributions in this
-project's own notes, four of which had propagated into the code comments.
+The literature review, the problem definition and the research direction are
+my own work. Claude (Anthropic) wrote portions of the code and helped draft
+parts of the documentation. Every number here comes from code in this
+repository that anyone can run.
 
 ## Licence
 

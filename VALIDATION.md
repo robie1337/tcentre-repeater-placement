@@ -19,13 +19,11 @@ Run with `python scripts/w1_validate.py`.
 The coherence cliff was reproduced on the authors' own topology file rather
 than on a reconstruction, which makes it the strongest of the four.
 
-### Correction: the 40 km threshold was never exactly 40 km
-
-Until 24 August 2026 this table reported the threshold as exactly 40.0 km,
-which read as an exact reproduction of the paper's figure. It was an artifact
-of the scan grid. The sweep stepped 2.5 km from a 5.0 km start, so it sampled
-37.5 km and then 40.0 km, and 40.0 was simply the first sample past the
-crossover.
+**The 40 km threshold was never exactly 40 km.** Until 24 August 2026 this
+table reported it as exactly 40.0 km, which read as an exact reproduction of
+the paper's figure. It was an artifact of the scan grid: the sweep stepped
+2.5 km from a 5.0 km start, sampling 37.5 then 40.0, and 40.0 was simply the
+first sample past the crossover.
 
 The crossover is 38.3 km in closed form and 38.5 km from the solver at 0.5 km
 resolution. Both scans now run at 0.5 km. This is still a pass against
@@ -37,12 +35,11 @@ candidate sites the best two-hop split leaves a worst link of 6/11 of the
 backbone rather than 1/2, which inflates the crossover by about ten per cent.
 With candidate sites everywhere the crossover is 34.9 km.
 
-## Checks this project ran on itself
+## Checks on our own assumptions
 
-### The rate equation leaves its own validity regime
-
-Eq. (2) of the source paper is stated to hold where `W * p_min >> 1`. Across
-5,286 solves with a defined value, it never holds. The median is 0.033.
+**The rate equation leaves its own validity regime.** Eq. (2) of the source
+paper is stated to hold where `W * p_min >> 1`. Across 5,286 solves with a
+defined value it never holds, median 0.033.
 
 This is reported as a finding rather than fixed silently, because it is the
 main result. Three rate models are implemented so that the conclusion can be
@@ -50,18 +47,16 @@ tested against the assumption: the paper's own, a memoryless floor, and a
 buffered model valid at low success probability. The parameter ranking
 survives all three.
 
-### The swap-noise term was swept rather than assumed
-
-Eq. (5) carries a per-swap factor whose physical identity is ambiguous for
-this platform. Rather than pick a number, the combined factor is swept across
-[0.71, 0.997], bracketed at the low end by measured gate and SPAM figures and
-at the high end by projected cavity-assisted readout. The ranking does not
+**The swap-noise term was swept rather than assumed.** Eq. (5) carries a
+per-swap factor whose physical identity is ambiguous for this platform.
+Rather than pick a number, the combined factor is swept across [0.71, 0.997],
+bracketed at the low end by measured gate and SPAM figures and at the high
+end by projected cavity-assisted readout. The ranking does not
 change anywhere in that bracket.
 
-### Candidate spacing is a C band choice
-
-The 80 km site spacing was inherited without being tested. Checked on
-24 August 2026 by re-solving at 80, 40 and 20 km:
+**Candidate spacing is a C band choice.** The 80 km site spacing was
+inherited without being tested. Checked on 24 August 2026 by re-solving at
+80, 40 and 20 km:
 
 - Pairs served does not change at unlimited budget. Coverage and feasibility
   conclusions are robust to the spacing.
@@ -100,11 +95,9 @@ vendor's. The verified values are 0.41(2) ms for the electron spin echo,
 nuclear spin. This makes the coherence evidence stronger than the project had
 been treating it.
 
-### Still open from the audit
-
-The "220 ms" upper bound this project had been quoting for nuclear coherence
-appears in none of the sources checked. Until it is found, the verified claim
-is 112(12) ms.
+The audit left two things open. The "220 ms" upper bound this project had
+been quoting for nuclear coherence appears in none of the sources checked.
+Until it turns up, the verified claim is 112(12) ms.
 
 The sweep box's lower coherence bound of 1 ms sits below the measured
 electron echo of 0.41 ms. The bound is defensible only because the model

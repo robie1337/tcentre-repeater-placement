@@ -1,7 +1,5 @@
 # The problem
 
-## Statement
-
 Take a published mixed integer program for quantum repeater placement,
 validated at 1550 nm. Move it to 1326 nm, where the silicon T centre emits.
 Determine what the model says about a continental fibre network under that
@@ -31,7 +29,7 @@ The only intended change is `alpha`, from 0.2 dB/km to 0.35 dB/km, with
 `F_L`, `q_s`, `R_gen` and `T2` swept across ranges bracketed by published
 measurements rather than fixed at assumed values.
 
-## What counts as an answer
+The answer has to clear four bars.
 
 1. The model reproduces the source paper's published results before it is
    modified. Reproduction means the paper's own reported numbers on the
@@ -49,7 +47,7 @@ measurements rather than fixed at assumed values.
 
 Point 4 is where the actual contribution turned out to be.
 
-## Constraints on method
+## Method constraints
 
 No discrete-event simulation. The placement model consumes one rate and one
 fidelity per candidate path, both of which have closed forms in the source
@@ -69,16 +67,12 @@ No claim beyond the model. The study says where repeaters go under a given
 set of assumptions. It does not say the technology works, and any statement
 about readiness has to be traceable to a measured number.
 
-## What was deliberately not done
-
-A cross-platform comparison against nitrogen-vacancy centres, silicon-vacancy
-centres, and trapped ions through the same model. It is the interesting
-follow-up and it would have displaced the reproduction work, so it was
-deferred.
-
-Validation against a discrete-event simulator such as NetSquid or SeQUeNCe.
-This remains the largest open gap in the work and is stated as such in
-[VALIDATION.md](VALIDATION.md).
+Two things were left out on purpose. A cross-platform comparison against
+nitrogen-vacancy centres, silicon-vacancy centres and trapped ions through
+the same model is the interesting follow-up, and it would have displaced the
+reproduction work. Validation against a discrete-event simulator such as
+NetSquid or SeQUeNCe is the largest open gap in the work, and
+[VALIDATION.md](VALIDATION.md) says so.
 
 ## Why this problem
 
@@ -93,8 +87,6 @@ Separately, published placement work uses European and American research
 networks. Canadian carrier geography is different in a way that matters: the
 distances are long enough that the speed of light, rather than any hardware
 property, sets the floor on what a memory has to survive.
-
-## Success criteria for the report
 
 The report frames the wavelength-transfer failure as the contribution and the
 optimiser as the evidence for it. It states the sensitivity result on the
