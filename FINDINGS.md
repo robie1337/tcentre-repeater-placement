@@ -46,7 +46,7 @@ each one has to reach before all eighteen pairs can be served:
 All four sit between 61 and 88 per cent of the way up. Serving the whole
 network needs essentially the entire roadmap, not part of it.
 
-## The rate equation leaves its own validity regime
+## Where the rate equation breaks
 
 This is the main result and it was not anticipated.
 
@@ -96,7 +96,7 @@ already showed.
 So the O band network is repeater-hungry at every scale, and it is the same
 16x loss penalty seen from both ends.
 
-## Buffering, and how far the ranking holds
+## Buffering and robustness
 
 The memoryless rate floor collapses coverage to 3 of 18 pairs. The buffered
 model matches the ceiling at 18 of 18. T centre coherence spans 12 to 125
@@ -112,7 +112,7 @@ served and 0.78 on utility. Swept across the full corrected swap-noise
 bracket [0.71, 0.997] it stays between 0.82 and 0.91, while swap quality
 never exceeds 0.10.
 
-## What this does not show
+## Limits
 
 The model has not been validated against a discrete-event simulator. No
 comparison was run against other qubit platforms, so nothing here says the

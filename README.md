@@ -45,7 +45,3 @@ The literature review, the problem definition and the research direction are
 my own work. Claude (Anthropic) wrote portions of the code and helped draft
 parts of the documentation. Every number here comes from code in this
 repository that anyone can run.
-
-## Licence
-
-MIT. See [LICENSE](LICENSE).

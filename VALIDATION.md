@@ -5,7 +5,7 @@ someone else published. This file records what was checked, what passed, and
 what turned out to be wrong. The errors include several of this project's
 own.
 
-## Reproductions of the source paper
+## Reproductions
 
 Run with `python scripts/w1_validate.py`.
 
@@ -35,7 +35,7 @@ candidate sites the best two-hop split leaves a worst link of 6/11 of the
 backbone rather than 1/2, which inflates the crossover by about ten per cent.
 With candidate sites everywhere the crossover is 34.9 km.
 
-## A note on third-party material
+## Third-party data
 
 `data/SurfnetCore.gml` is not redistributed here. It is the source paper
 authors' own data, their repository carries no licence file, and the file
@@ -49,7 +49,7 @@ skips and the rest of the pipeline runs.
 The seven lines of the authors' solver quoted below are a quotation for
 comparison, attributed, not a copy of their program.
 
-## How each reproduction was done
+## How each one was done
 
 `w1_validate.py` checks the model against results someone else published.
 
@@ -94,7 +94,7 @@ the Community Edition, free and needing no registration, capped at 1000
 variables. Every instance here fits: the full CA9 model is 809 variables,
 and all three solvers return 200.860328 on it.
 
-### Cross-check against the authors' published code
+### Against the authors' published code
 
 Their repository is `github.com/pooryousefshahrooz/q_net_planning`, and it
 depends on CPLEX and NetworkX with no simulator, which is the claim made at
@@ -134,7 +134,7 @@ keeps fidelity in, which is the point of the exercise.
 
 ## Checks on our own assumptions
 
-**The rate equation leaves its own validity regime.** Eq. (2) of the source
+**The rate equation leaves its stated regime.** Eq. (2) of the source
 paper is stated to hold where `W * p_min >> 1`. Across 5,286 solves with a
 defined value it never holds, median 0.033.
 
@@ -200,7 +200,7 @@ The sweep box's lower coherence bound of 1 ms sits below the measured
 electron echo of 0.41 ms. The bound is defensible only because the model
 assumes a nuclear memory, and the report has to say which memory it means.
 
-## The largest remaining gap
+## What is not validated
 
 This is a planning model. It has not been validated against a discrete-event
 simulator, so its rate and fidelity predictions inherit whatever the source

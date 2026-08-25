@@ -16,7 +16,7 @@ dropped, which is a strict dominance and cuts the candidate set by about 60
 per cent.
 
 
-## There is no network simulator here, and that is deliberate
+## Why there is no simulator
 
 The model needs two numbers per candidate path: an end-to-end rate and an
 end-to-end fidelity. Both have closed forms in the source paper, Eqs. (2) and
@@ -41,7 +41,7 @@ needing thousands of runs per estimate. Multiplied by the several thousand
 solves in the sweep, that does not fit in two weeks.
 
 
-## Assumptions that are choices, not facts
+## Assumptions
 
 These are the things a reviewer should push on, listed rather than buried.
 
@@ -95,7 +95,7 @@ exactly the feasibility boundary. The validation runs, which need the
 infeasibility cliff, keep the requirement on.
 
 
-## Sources for the hardware numbers
+## Where the hardware numbers come from
 
 | Quantity | Range | Source |
 |---|---|---|
