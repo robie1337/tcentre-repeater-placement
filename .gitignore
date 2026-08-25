@@ -13,3 +13,6 @@ Thumbs.db
 *.sol
 gurobi.log
 run.bat
+
+# Third-party data, not ours to redistribute. See VALIDATION.md.
+data/SurfnetCore.gml

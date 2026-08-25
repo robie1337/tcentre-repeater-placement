@@ -45,7 +45,16 @@ def main() -> None:
     banner("COHERENCE CLIFF ON THE AUTHORS' OWN SURFNET TOPOLOGY")
 
     if not GML.exists():
-        raise SystemExit(f"missing {GML}. Download SurfnetCore.gml first.")
+        # Not redistributed here. The file is the source paper authors' own
+        # data and their repository carries no licence, so it is not ours to
+        # relicense. Fetch it and this check reproduces as documented.
+        print(f"   SKIPPED: {GML.name} is not present.")
+        print("   This check needs the source paper authors' own SURFnet")
+        print("   topology, which is not redistributed with this repository.")
+        print("   Get it from data/SurfnetCore.gml in")
+        print("   github.com/pooryousefshahrooz/q_net_planning and place it")
+        print(f"   at {GML.relative_to(GML.parents[1])}.")
+        return
 
     topo, resolved = build_surfnet(GML)
     print(f"loaded {GML.name}: {topo.graph.number_of_nodes()} nodes, "

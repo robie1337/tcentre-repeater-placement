@@ -35,6 +35,20 @@ candidate sites the best two-hop split leaves a worst link of 6/11 of the
 backbone rather than 1/2, which inflates the crossover by about ten per cent.
 With candidate sites everywhere the crossover is 34.9 km.
 
+## A note on third-party material
+
+`data/SurfnetCore.gml` is not redistributed here. It is the source paper
+authors' own data, their repository carries no licence file, and the file
+appears to originate from the Internet Topology Zoo before that. Neither
+licence could be confirmed, so relicensing it under this repository's MIT
+terms is not something we can do. Fetch it from
+`github.com/pooryousefshahrooz/q_net_planning` and drop it in `data/`, and
+the coherence cliff check reproduces as documented. Without it that one check
+skips and the rest of the pipeline runs.
+
+The seven lines of the authors' solver quoted below are a quotation for
+comparison, attributed, not a copy of their program.
+
 ## How each reproduction was done
 
 `w1_validate.py` checks the model against results someone else published.
