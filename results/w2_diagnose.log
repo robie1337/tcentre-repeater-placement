@@ -1,0 +1,56 @@
+﻿
+==============================================================================
+DIAGNOSING THE SWEEP
+==============================================================================
+
+-- The best corner of the sweep box
+   utility 200.860 | 47 repeaters | 18/18 pairs served
+   So the ceiling seen in the sweep is a property of the sample,
+   not of the hardware. Saltelli and Latin hypercube samples put
+   very few points near a corner of a four-dimensional box, and
+   the two-dimensional grids hold the other two parameters at
+   their midpoints by construction.
+
+-- How good does each parameter have to be, with the others at their best
+   Generation rate (Hz)       needs at least 7.448e+04
+   Coherence time T2 (s)      needs at least 0.01661
+   Link fidelity F_L          needs at least 0.9742
+   Swap success q_s           needs at least 0.8966
+   wrote results\w2_requirements.csv  (4 rows)
+
+   Read this as a hardware requirement: with everything else at the
+   top of its published range, this is the level each parameter has
+   to reach before the nine city network can serve all of its
+   traffic.
+
+-- How far outside the rate approximation is this network
+   worst-link success probability on the chosen paths:
+     median 0.00237, worst 9.12e-06
+   memories per node needed for W * p_min = 1:
+     median 422, worst 109,648
+   memories per node actually modelled: 100
+
+   across the sweep: 5286 of 5286 solves have W * p_min < 1
+     median 0.0332, worst 7.87e-05
+
+-- What that means, stated plainly
+   Eq. (2) of the paper is R = q_s^(h-1) W p_min, and the paper says
+   it holds where W p_min >> 1. On this network it never does.
+
+   The reason is the O band. At 0.35 dB/km an 80 km link transmits
+   1.58e-03 of the photons sent, so reaching W p_min = 1
+   needs about 631 memories per node. The paper's own
+   experiments use 100. At the C band value of 0.2 dB/km the same
+   link transmits 2.51e-02, needing about 40, which is
+   why the approximation is reasonable in their setting and not in
+   ours.
+
+   This is a finding, not a bug. Moving a placement model from the
+   C band to the O band breaks an approximation the published model
+   relies on, and the fix is either far more multiplexing or a rate
+   equation that stays valid at low p. It belongs in the report as
+   a limitation and in the next stage as a question.
+
+==============================================================================
+DIAGNOSIS COMPLETE
+==============================================================================

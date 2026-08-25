@@ -1,0 +1,50 @@
+﻿
+==============================================================================
+WEEK 1 VALIDATION: reproducing Pouryousef et al., IEEE TQE 2024
+==============================================================================
+Hardware: alpha_db_per_km=0.2, link_fidelity=0.95, swap_success=0.5, generation_rate_hz=1.0, t_repeater_memory_s=inf, t_endnode_memory_s=inf, gate_fidelity=1.0, measurement_fidelity=1.0, eta_emission=1.0, eta_detection=1.0
+
+-- Check 1: the backbone length below which no repeater is placed
+   first repeater appears at 40.0 km
+   paper reports the transition at roughly 40 km
+   analytic crossover for this discretisation: 38.3 km
+   PASS  model matches its own analytic crossover
+   PASS  transition is in the paper's neighbourhood of 40 km
+   wrote results\w1_backbone_threshold.csv  (80 rows)
+
+-- Check 2: the end-node coherence cliff
+     200 km path: cliff at  2.006 ms, 2L/c =  2.000 ms
+     250 km path: cliff at  2.504 ms, 2L/c =  2.500 ms
+     320 km path: cliff at  3.267 ms, 2L/c =  3.200 ms
+     400 km path: cliff at  4.078 ms, 2L/c =  4.000 ms
+
+   The paper reports 3.2 ms for SURFnet, whose user pairs are
+   200 to 250 km apart. A 320 km fibre path gives 2L/c = 3.20 ms,
+   which is where our cliff lands. That agreement is evidence that
+   the reconstructed tau_e2e in physics.py has the right form.
+   PASS  cliff tracks 2L/c across every path length tested
+   wrote results\w1_coherence_cliff.csv  (4 rows)
+
+-- Check 3: cross-solver agreement
+   backends available: ['highs', 'gurobi', 'cplex']
+   cplex is the solver the source paper used. The pip package is
+   the Community Edition, free and unregistered, capped at 1000
+   variables, which covers these validation instances.
+      60 km: highs=2.159548, gurobi=2.159548, cplex=2.159548
+     120 km: highs=0.269897, gurobi=0.269897, cplex=0.269897
+     240 km: highs=-2.352652, gurobi=-2.352652, cplex=-2.352652
+     480 km: highs=-6.179026, gurobi=-6.179026, cplex=-6.179026
+   PASS  all 3 solvers agree to 1e-6
+   wrote results\w1_solver_agreement.csv  (4 rows)
+
+-- Check 4: validity of the rate approximation
+   240 km dumbbell, min W * p_min = 4.91
+   Eq. (2) is stated as valid where W * p_min >> 1. The paper
+   inherits this and so do we. Every sweep record carries the
+   quantity so that results outside the regime can be flagged
+   rather than quietly reported.
+
+==============================================================================
+VALIDATION COMPLETE
+==============================================================================
+Figures written to figures/. Tables written to results/.

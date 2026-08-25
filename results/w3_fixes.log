@@ -1,0 +1,89 @@
+﻿python : [Parallel(n_jobs=6)]: Using backend LokyBackend with 6 concurrent workers.
+At line:1 char:349
++ ... -placement; python scripts\w3_fixes.py --jobs 6 *> results\w3_fixes.l ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ([Parallel(n_job...urrent workers.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+[Parallel(n_jobs=6)]: Done   6 tasks      | elapsed:   48.0s
+[Parallel(n_jobs=6)]: Done  18 out of  24 | elapsed:  2.1min remaining:   42.9s
+[Parallel(n_jobs=6)]: Done  24 out of  24 | elapsed:  2.8min finished
+[Parallel(n_jobs=6)]: Using backend LokyBackend with 6 concurrent workers.
+[Parallel(n_jobs=6)]: Done   6 tasks      | elapsed:   16.2s
+[Parallel(n_jobs=6)]: Done  18 out of  24 | elapsed:   47.9s remaining:   15.9s
+[Parallel(n_jobs=6)]: Done  24 out of  24 | elapsed:  1.1min finished
+
+==============================================================================
+W3: DO THE MODEL FIXES CHANGE THE CONCLUSIONS?
+==============================================================================
+
+-- 1. The rate bracket on the full network
+   midrange   paper        utility 70.806 | 54 repeaters | 12/18 pairs served
+   midrange   coordinated  utility 56.406 | 53 repeaters | 11/18 pairs served
+   projected  paper        utility 200.860 | 47 repeaters | 18/18 pairs served
+   projected  coordinated  utility 176.784 | 47 repeaters | 18/18 pairs served
+   wrote results\w3_rate_bracket.csv  (4 rows)
+
+   Reading: 'paper' is the optimistic pipelined end of the bracket,
+   'coordinated' the conservative end. Compare served_pairs and the
+   placement story across the two, not the absolute utilities —
+   the utility scales differ because the models count differently.
+
+-- 2. Four-parameter Sobol under the coordinated (valid at low W*p) model
+   6144 solves in 2.9 min
+   wrote results\w3_sobol_coordinated.csv  (6144 rows)
+
+Sobol indices on served_pairs: 6144 model solves, 858 infeasible
+  Coherence time T2 (s)      S1 =  0.741 +/- 0.062   ST =  0.838 +/- 0.066
+  Swap success q_s           S1 =  0.070 +/- 0.035   ST =  0.137 +/- 0.017
+  Generation rate (Hz)       S1 =  0.070 +/- 0.030   ST =  0.121 +/- 0.017
+  Link fidelity F_L          S1 =  0.028 +/- 0.021   ST =  0.058 +/- 0.008
+
+Sobol indices on utility: 6144 model solves, 858 infeasible
+  Coherence time T2 (s)      S1 =  0.703 +/- 0.075   ST =  0.777 +/- 0.074
+  Generation rate (Hz)       S1 =  0.162 +/- 0.043   ST =  0.214 +/- 0.028
+  Swap success q_s           S1 =  0.052 +/- 0.024   ST =  0.084 +/- 0.012
+  Link fidelity F_L          S1 =  0.011 +/- 0.013   ST =  0.025 +/- 0.004
+
+   Compare with results/w2_sobol_indices.csv (paper model). If the
+   ordering matches, the ranking is not an artifact of Eq. (2).
+
+-- 2b. Phase diagram (t2 x rate) under the coordinated model
+   wrote results\w3_grid_t2_rate_coordinated.csv  (576 rows)
+   wrote figures/fig_phase_t2_rate_served_coordinated.pdf
+
+-- 3. Five-parameter Sobol including the per-swap noise factor
+   bracket [0.848, 1.0]: measured-today worst case to the paper's
+   perfect-operations assumption
+   3584 solves in 1.1 min
+   wrote results\w3_sobol_5param.csv  (3584 rows)
+
+Sobol indices on served_pairs: 3584 model solves, 499 infeasible
+  Coherence time T2 (s)      S1 =  0.577 +/- 0.097   ST =  0.718 +/- 0.106
+  Per-swap noise factor      S1 =  0.089 +/- 0.054   ST =  0.199 +/- 0.035
+  Generation rate (Hz)       S1 =  0.042 +/- 0.044   ST =  0.144 +/- 0.029
+  Link fidelity F_L          S1 =  0.046 +/- 0.041   ST =  0.118 +/- 0.022
+  Swap success q_s           S1 =  0.012 +/- 0.042   ST =  0.093 +/- 0.019
+
+Sobol indices on utility: 3584 model solves, 499 infeasible
+  Coherence time T2 (s)      S1 =  0.704 +/- 0.123   ST =  0.781 +/- 0.116
+  Generation rate (Hz)       S1 =  0.130 +/- 0.050   ST =  0.174 +/- 0.035
+  Per-swap noise factor      S1 =  0.014 +/- 0.031   ST =  0.056 +/- 0.014
+  Swap success q_s           S1 =  0.022 +/- 0.026   ST =  0.053 +/- 0.014
+  Link fidelity F_L          S1 =  0.013 +/- 0.019   ST =  0.031 +/- 0.008
+   wrote results\w3_sobol_5param_indices.csv  (10 rows)
+
+-- 4. Raising the memory ceiling to 2048: does the model buy its way out?
+   width grid: (1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048)
+   paper        utility 281.792 | 47 repeaters | 18/18 pairs served
+                widths chosen: [256, 512, 1024]; 3/18 paths at W >= 631
+   coordinated  utility 257.746 | 47 repeaters | 18/18 pairs served
+                widths chosen: [256, 512, 1024]; 3/18 paths at W >= 631
+   wrote results\w3_memory_ceiling.csv  (36 rows)
+
+   Under the paper model W*p_min >= 1 becomes reachable at high W;
+   whether the optimiser pays for it is the memory-pricing result.
+
+==============================================================================
+W3 COMPLETE
+==============================================================================

@@ -1,0 +1,22 @@
+|--- log10(Coherence time T2 (s)) <= -2.263
+|   |--- log10(Coherence time T2 (s)) <= -2.523
+|   |   |--- log10(Coherence time T2 (s)) <= -2.723
+|   |   |   |--- value: [0.000]
+|   |   |--- log10(Coherence time T2 (s)) >  -2.723
+|   |   |   |--- value: [1.959]
+|   |--- log10(Coherence time T2 (s)) >  -2.523
+|   |   |--- log10(Coherence time T2 (s)) <= -2.408
+|   |   |   |--- value: [3.117]
+|   |   |--- log10(Coherence time T2 (s)) >  -2.408
+|   |   |   |--- value: [5.508]
+|--- log10(Coherence time T2 (s)) >  -2.263
+|   |--- log10(Generation rate (Hz)) <= 3.853
+|   |   |--- Swap success q_s <= 0.637
+|   |   |   |--- value: [7.235]
+|   |   |--- Swap success q_s >  0.637
+|   |   |   |--- value: [10.813]
+|   |--- log10(Generation rate (Hz)) >  3.853
+|   |   |--- Swap success q_s <= 0.722
+|   |   |   |--- value: [11.098]
+|   |   |--- Swap success q_s >  0.722
+|   |   |   |--- value: [13.432]

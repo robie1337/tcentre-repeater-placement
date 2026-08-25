@@ -1,0 +1,6 @@
+case,alpha_db_per_km,link_fidelity,swap_success,solver_km,analytic_km,continuum_km
+"C band, paper baseline",0.2,0.95,0.5,38.5,38.3436233226791,34.85783938425373
+"O band, paper's other params",0.35,0.95,0.5,22.0,21.910641898673777,19.918765362430708
+"O band, T centre midrange",0.35,0.96,0.7,12.5,12.081780513482764,10.983436830438878
+"O band, T centre projected",0.35,0.998,0.95,2.0,1.5097903022802388,1.372536638436581
+"O band, T centre measured",0.35,0.6,0.5,,inf,inf

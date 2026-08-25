@@ -1,0 +1,5 @@
+parameter,key,box_low,box_high,needed_for_all_18,fraction_of_range
+Generation rate (Hz),generation_rate_hz,1000.0,200000.0,74477.38219916487,0.813559322033898
+Coherence time T2 (s),t2_s,0.001,0.1,0.016608827826277157,0.6101694915254238
+Link fidelity F_L,link_fidelity,0.92,0.998,0.9742033898305085,0.694915254237288
+Swap success q_s,swap_success,0.5,0.95,0.8966101694915254,0.8813559322033898

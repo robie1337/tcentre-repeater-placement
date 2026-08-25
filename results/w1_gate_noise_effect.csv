@@ -1,0 +1,5 @@
+hardware,assumption,status,utility,served_pairs,n_repeaters
+midrange,perfect gates (used in this project),optimal,70.80619843888185,12,54
+midrange,measured T centre gates,optimal,34.340145843027194,5,15
+projected,perfect gates (used in this project),optimal,200.86032806688323,18,47
+projected,measured T centre gates,optimal,90.04455482653692,11,41

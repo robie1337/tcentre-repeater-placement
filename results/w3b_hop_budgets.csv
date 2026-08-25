@@ -1,0 +1,5 @@
+s_q,label,hops_at_0.92,hops_at_0.96,hops_at_0.998
+0.71,measured today (SPAM floor),3,3,4
+0.848,earlier premise (unverified),4,5,7
+0.997,projected ceiling,9,19,194
+1.0,paper assumption,9,20,299

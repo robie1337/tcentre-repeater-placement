@@ -1,0 +1,56 @@
+﻿
+==============================================================================
+IS THE RATE-APPROXIMATION BIAS A CONFOUND?
+==============================================================================
+
+-- 1. Below the coherence threshold, is anything actually varying?
+   The claim under test: 'generation rate changes the outcome by
+   exactly zero' looks like a degenerate feasible region.
+
+   240 grid points at or below 6.1 ms
+     served_pairs   flat in 10/10 columns, max spread across rate = 0
+     n_repeaters    flat in 10/10 columns, max spread across rate = 0
+     utility        flat in 4/10 columns, max spread across rate = 68.79
+
+   Reading: served_pairs and n_repeaters are integer counts gated by
+   a hard feasibility test that rate does not enter, so exact zeros
+   are the expected behaviour, not a degeneracy. If utility also
+   shows zero spread, that WOULD be suspicious, because utility
+   scales with rate on every served pair.
+
+-- 2. Is the violation uniform across the box, or does it correlate?
+   5286 solves with a defined W * p_min
+   range 7.87e-05 to 0.607, median 0.0332
+
+   Spearman correlation of log10(W * p_min) with each swept parameter:
+     generation_rate_hz     rho = -0.2237  <-- moderate
+     t2_s                   rho = -0.6839  <-- strong
+     link_fidelity          rho = -0.1743
+     swap_success           rho = -0.2676  <-- moderate
+   wrote results\w2_bias_correlation.csv  (4 rows)
+
+-- 3. How far does the violation range across the box?
+   W * p_min spans 3.9 orders of magnitude across the sweep.
+
+   That is NOT uniform. The bias is far worse in some of the box
+   than in others, so 'it biases every point the same way' is too
+   strong a defence as stated.
+
+-- 4. Verdict
+   Strongest correlate: t2_s (rho = -0.684)
+
+   What this does and does not license:
+
+   - If the violation correlates strongly with a swept parameter,
+     that parameter's Sobol index is partly measuring the bias.
+   - If it correlates with generation rate specifically, then the
+     rate index is the suspect one, and the headline claim that
+     COHERENCE dominates is unaffected, because coherence acts
+     through a feasibility constraint that contains no rate term.
+   - The honest statement for the report is whichever of those the
+     numbers above support. Do not assert the ranking is safe
+     without pointing at this table.
+
+==============================================================================
+DONE
+==============================================================================

@@ -1,0 +1,27 @@
+# Core. Everything below installs with pip, with no registration step and
+# nothing to compile.
+numpy
+scipy            # provides the HiGHS MILP backend via scipy.optimize.milp
+networkx         # the topology graph and shortest paths
+pandas           # results tables
+matplotlib       # figures
+joblib           # parallel sweep driver
+SALib            # Saltelli sampling and Sobol indices
+
+# Regime labelling in scripts/w2_boundaries.py. Optional: the script reports
+# that it is skipping the fit if this is absent.
+scikit-learn
+
+# Tests.
+pytest
+
+# Optional extra solvers. The cross-check in scripts/w1_validate.py uses
+# whichever of these are present. Both ship a free size-limited licence in
+# the pip package that is large enough for this model, so neither needs a
+# licence request to be useful here.
+#
+# cplex is the solver the source paper used, so agreement with it is the
+# most direct check available. Its Community Edition caps out at 1000
+# variables; the full CA9 model is 809.
+gurobipy
+cplex

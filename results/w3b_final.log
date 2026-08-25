@@ -1,0 +1,66 @@
+﻿python : [Parallel(n_jobs=6)]: Using backend LokyBackend with 6 concurrent workers.
+At line:1 char:428
++ ... ct -Last 3; python scripts\w3b_final.py --jobs 6 *> results\w3b_final ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ([Parallel(n_job...urrent workers.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+[Parallel(n_jobs=6)]: Done   6 tasks      | elapsed:   26.2s
+[Parallel(n_jobs=6)]: Done  18 out of  24 | elapsed:  1.1min remaining:   22.1s
+[Parallel(n_jobs=6)]: Done  24 out of  24 | elapsed:  1.5min finished
+
+==============================================================================
+W3B: FINAL BRACKET AND CORRECTED SWAP-QUALITY SWEEP
+==============================================================================
+
+-- 1. The three-model rate bracket
+   midrange   paper        utility 70.806 | 54 repeaters | 12/18 pairs served
+   midrange   ext          utility 18.408 | 7 repeaters | 3/18 pairs served
+   midrange   coordinated  utility 56.406 | 53 repeaters | 11/18 pairs served
+   projected  paper        utility 200.860 | 47 repeaters | 18/18 pairs served
+   projected  ext          utility 32.649 | 7 repeaters | 3/18 pairs served
+   projected  coordinated  utility 176.784 | 47 repeaters | 18/18 pairs served
+   wrote results\w3b_three_model_bracket.csv  (6 rows)
+
+   paper = infinite-buffer flow ceiling (Pouryousef Eq. 2 / Razavi 2009);
+   ext = exact slotted throughput (Shi & Qian, SIGCOMM 2020);
+   coordinated = buffered waiting-time model (Bernardes 2011 structure).
+
+-- 2. Five-parameter Sobol, swap quality in [0.71, 0.997], EXT rate model
+   3584 solves in 1.5 min
+   wrote results\w3b_sobol_5param_ext.csv  (3584 rows)
+
+Sobol indices on served_pairs: 3584 model solves, 499 infeasible
+  Coherence time T2 (s)      S1 =  0.752 +/- 0.129   ST =  0.824 +/- 0.097
+  Generation rate (Hz)       S1 =  0.081 +/- 0.048   ST =  0.151 +/- 0.029
+  Per-swap noise factor      S1 =  0.063 +/- 0.043   ST =  0.104 +/- 0.024
+  Link fidelity F_L          S1 = -0.012 +/- 0.023   ST =  0.049 +/- 0.014
+  Swap success q_s           S1 =  0.007 +/- 0.017   ST =  0.035 +/- 0.012
+
+Sobol indices on utility: 3584 model solves, 499 infeasible
+  Coherence time T2 (s)      S1 =  0.904 +/- 0.152   ST =  0.911 +/- 0.089
+  Generation rate (Hz)       S1 =  0.048 +/- 0.025   ST =  0.048 +/- 0.009
+  Per-swap noise factor      S1 =  0.006 +/- 0.011   ST =  0.007 +/- 0.002
+  Swap success q_s           S1 =  0.001 +/- 0.007   ST =  0.003 +/- 0.001
+  Link fidelity F_L          S1 = -0.000 +/- 0.004   ST =  0.002 +/- 0.000
+   wrote results\w3b_sobol_final_indices.csv  (10 rows)
+
+-- 3. Hop budgets at the swap-quality anchors
+   (longest path whose end-to-end fidelity stays above 1/2)
+
+        s_q | F_L=0.92 | F_L=0.96 | F_L=0.998
+   ------------------------------------------
+       0.71 |      3 |      3 |      4   measured today (SPAM floor)
+      0.848 |      4 |      5 |      7   earlier premise (unverified)
+      0.997 |      9 |     19 |    194   projected ceiling
+        1.0 |      9 |     20 |    299   paper assumption
+   wrote results\w3b_hop_budgets.csv  (4 rows)
+
+   Benchmark: da Silva et al. (QST 9, 045041 (2024)) require swap
+   quality 0.996-0.997 for their 900 km NV chain. The T centre's
+   projected ceiling only just reaches that bar; today's measured
+   components sit far below it.
+
+==============================================================================
+W3B COMPLETE
+==============================================================================

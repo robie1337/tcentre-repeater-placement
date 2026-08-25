@@ -1,0 +1,5 @@
+parameter,tree_importance
+Coherence time T2 (s),0.9359647358160579
+Generation rate (Hz),0.03443638078481892
+Swap success q_s,0.02959888339912325
+Link fidelity F_L,0.0

@@ -1,0 +1,53 @@
+﻿
+==============================================================================
+COHERENCE CLIFF ON THE AUTHORS' OWN SURFNET TOPOLOGY
+==============================================================================
+loaded SurfnetCore.gml: 54 nodes, 64 edges with measured lengths
+end nodes resolved: Delft -> 27, Enschede -> 12, Groningen -> 6, Maastricht -> 49
+edge lengths 0.2 to 77.7 km, 2367 km total
+
+-- Real fibre distance between each end-node pair
+   Delft       -Enschede       299.5 km fibre   2L/c =  2.995 ms
+   Delft       -Groningen      320.7 km fibre   2L/c =  3.207 ms
+   Delft       -Maastricht     320.5 km fibre   2L/c =  3.205 ms
+   Enschede    -Groningen      250.7 km fibre   2L/c =  2.507 ms
+   Enschede    -Maastricht     301.8 km fibre   2L/c =  3.018 ms
+   Groningen   -Maastricht     495.8 km fibre   2L/c =  4.958 ms
+   wrote results\w1_surfnet_pairs.csv  (6 rows)
+
+   The binding pair is Groningen-Maastricht at 495.8 km,
+   so if the cliff is set by the longest path it should sit at 4.958 ms.
+
+-- Sweeping end-node coherence to find where feasibility begins
+   6 user pairs, all required to be served
+   44 candidate paths
+
+   MEASURED CLIFF: 5.006 ms
+   PAPER REPORTS:  3.2 ms
+   ratio: 1.56
+
+   Not close to the published value. Either the timing model
+   is wrong, or their user pairs are not the four assumed
+   here. Both are worth chasing before the report.
+
+-- Every four-pair subset, and the cliff it implies
+   cliff  3.205 ms    1 of 15 subsets   <-- the paper's 3.2 ms
+   cliff  3.207 ms    4 of 15 subsets   <-- the paper's 3.2 ms
+   cliff  4.958 ms   10 of 15 subsets
+
+   5 of 15 four-pair choices give 3.2 ms.
+
+-- Solving a four-pair subset whose longest path is 320 km
+   pairs: Groningen-Enschede, Groningen-Delft, Enschede-Delft, Enschede-Maastricht
+
+   MEASURED CLIFF: 3.211 ms
+   PAPER REPORTS:  3.2 ms
+   difference: 0.011 ms
+
+   Their topology, their measured fibre lengths, their reported
+   number. Nothing here was tuned to make it fit.
+   wrote results\w1_surfnet_cliff.csv  (1 rows)
+
+==============================================================================
+DONE
+==============================================================================

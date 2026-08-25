@@ -1,0 +1,5 @@
+hardware,rate_model,status,utility,served_pairs,n_repeaters
+midrange,paper,optimal,70.806,12,54
+midrange,coordinated,optimal,56.406,11,53
+projected,paper,optimal,200.86,18,47
+projected,coordinated,optimal,176.784,18,47

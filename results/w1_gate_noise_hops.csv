@@ -1,0 +1,3 @@
+case,max_hops_perfect,max_hops_measured
+midrange F_L = 0.96,20,5
+projected F_L = 0.998,200,7

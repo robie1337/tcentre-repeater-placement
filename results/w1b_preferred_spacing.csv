@@ -1,0 +1,37 @@
+case,reach_km,best_hops,spacing_km
+"C band, paper baseline",50.0,2,25.0
+"C band, paper baseline",100.0,2,50.0
+"C band, paper baseline",190.0,3,63.3
+"C band, paper baseline",200.0,3,66.7
+"C band, paper baseline",320.0,4,80.0
+"C band, paper baseline",500.0,5,100.0
+"C band, paper baseline",800.0,7,114.3
+"C band, paper baseline",1200.0,8,150.0
+"C band, paper baseline",1600.0,9,177.8
+"O band, paper's other params",50.0,2,25.0
+"O band, paper's other params",100.0,3,33.3
+"O band, paper's other params",190.0,4,47.5
+"O band, paper's other params",200.0,4,50.0
+"O band, paper's other params",320.0,6,53.3
+"O band, paper's other params",500.0,7,71.4
+"O band, paper's other params",800.0,9,88.9
+"O band, paper's other params",1200.0,10,120.0
+"O band, paper's other params",1600.0,12,133.3
+"O band, T centre midrange",50.0,3,16.7
+"O band, T centre midrange",100.0,4,25.0
+"O band, T centre midrange",190.0,6,31.7
+"O band, T centre midrange",200.0,6,33.3
+"O band, T centre midrange",320.0,7,45.7
+"O band, T centre midrange",500.0,9,55.6
+"O band, T centre midrange",800.0,11,72.7
+"O band, T centre midrange",1200.0,13,92.3
+"O band, T centre midrange",1600.0,15,106.7
+"O band, T centre projected",50.0,9,5.6
+"O band, T centre projected",100.0,12,8.3
+"O band, T centre projected",190.0,17,11.2
+"O band, T centre projected",200.0,17,11.8
+"O band, T centre projected",320.0,22,14.5
+"O band, T centre projected",500.0,27,18.5
+"O band, T centre projected",800.0,34,23.5
+"O band, T centre projected",1200.0,42,28.6
+"O band, T centre projected",1600.0,48,33.3

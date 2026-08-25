@@ -1,0 +1,7 @@
+hardware,rate_model,utility,served_pairs,n_repeaters
+midrange,paper,70.806,12,54
+midrange,ext,18.408,3,7
+midrange,coordinated,56.406,11,53
+projected,paper,200.86,18,47
+projected,ext,32.649,3,7
+projected,coordinated,176.784,18,47
