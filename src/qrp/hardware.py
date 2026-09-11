@@ -15,6 +15,7 @@ The sweep box at the bottom is the four-parameter space week 2 explores.
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass, replace
 
 # --------------------------------------------------------------------------
@@ -64,6 +65,24 @@ class Hardware:
     #: brackets the factor instead of resolving which physical quantity eta
     #: is for the T centre.
     swap_werner: float | None = None
+
+    def __post_init__(self) -> None:
+        for name in ("link_fidelity", "swap_success", "gate_fidelity", "measurement_fidelity",
+                     "eta_emission", "eta_detection"):
+            value = getattr(self, name)
+            if not 0.0 <= value <= 1.0:
+                raise ValueError(f"{name} must lie in [0, 1], got {value}")
+        if self.swap_werner is not None and not 0.0 <= self.swap_werner <= 1.0:
+            raise ValueError(f"swap_werner must be None or lie in [0, 1], got {self.swap_werner}")
+        if not (math.isfinite(self.alpha_db_per_km) and self.alpha_db_per_km >= 0.0):
+            raise ValueError(f"alpha_db_per_km must be finite and non-negative, got {self.alpha_db_per_km}")
+        if not (math.isfinite(self.generation_rate_hz) and self.generation_rate_hz > 0.0):
+            raise ValueError(f"generation_rate_hz must be finite and positive, got {self.generation_rate_hz}")
+        for name in ("t_repeater_memory_s", "t_endnode_memory_s"):
+            value = getattr(self, name)
+            # Infinity is allowed: the paper imposes no coherence limit.
+            if not value > 0.0:
+                raise ValueError(f"{name} must be positive, got {value}")
 
     def with_(self, **changes) -> "Hardware":
         """Return a copy with the named fields replaced."""
@@ -140,7 +159,9 @@ POURYOUSEF_BASELINE = Hardware(
 #: electron 0.41(2) ms. Independent group (Berkeley/LBNL), not the vendor.
 #: A link
 #: fidelity of 0.60 falls below the 1/2 floor after a single swap, so this
-#: preset shows where the hardware is, not a network that works.
+#: preset shows where the hardware is, not a network that works. The values
+#: come from separate experiments by different groups; no single device has
+#: shown all of them at once, so even this preset is a composite.
 TCENTRE_MEASURED = Hardware(
     alpha_db_per_km=0.35,
     link_fidelity=0.60,
@@ -151,7 +172,8 @@ TCENTRE_MEASURED = Hardware(
 )
 
 #: Mid-range T centre, the centre of the sweep box. Reference point for the
-#: single-case run at the end of week 1.
+#: single-case run at the end of week 1. A scenario, not a measured or
+#: projected device.
 TCENTRE_MIDRANGE = Hardware(
     alpha_db_per_km=0.35,
     link_fidelity=0.96,
@@ -161,7 +183,10 @@ TCENTRE_MIDRANGE = Hardware(
     t_endnode_memory_s=10e-3,
 )
 
-#: Published projection: 200 kHz at F = 0.998 (Afzal 2024 SVII).
+#: Published projection: 200 kHz at F = 0.998 (Afzal 2024 SVII). Swap success
+#: 0.95 and the 100 ms coherence are the top of the sweep box rather than part
+#: of that projection, so this preset is a composite scenario, not a device
+#: anyone has projected as a whole.
 TCENTRE_PROJECTED = Hardware(
     alpha_db_per_km=0.35,
     link_fidelity=0.998,

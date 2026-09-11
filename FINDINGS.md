@@ -103,8 +103,9 @@ So the O band network is repeater-hungry at every scale, and it is the same
 
 ## Buffering and robustness
 
-The memoryless rate floor collapses coverage to 3 of 18 pairs. The buffered
-model matches the ceiling at 18 of 18. T centre coherence spans 12 to 125
+Under the memoryless reference model coverage collapses to 3 of 18 pairs.
+Under the buffered model it is 18 of 18, the same as under Eq. (2). Neither
+model is claimed as a bound on the physical rate. T centre coherence spans 12 to 125
 slot round-trips, so buffering is exactly what this hardware provides. That
 is the coherence result arrived at from an independent direction, and it is
 the cleanest way to say why coherence dominates: coherence is what converts
@@ -162,10 +163,10 @@ routes of 12 to 19 hops the cost compounds.
 
 Most numbers in this file were produced with the legacy candidate path
 generator, which discarded tied routes, lost some hop counts, and pruned
-routes the network optimum can need (MODEL.md). The W6 table above has been
-rerun on the default generator, with every pair and repeater count unchanged
-(VALIDATION.md). The Sobol indices, the sweeps, and the W4 and W5 figures
-have not yet been rerun. The O band threshold table uses two-node test
+routes the network optimum can need (MODEL.md). W5 and the W6 table above
+have been rerun on the default generator: the W5 shares quoted above are
+unchanged, and so is every W6 pair and repeater count (VALIDATION.md). The
+Sobol indices, the sweeps, and the W4 figures have not yet been rerun. The O band threshold table uses two-node test
 networks and does not depend on the path generator.
 
 The waiting-time results rest on three assumptions: a link cannot retry

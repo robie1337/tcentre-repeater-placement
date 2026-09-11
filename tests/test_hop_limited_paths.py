@@ -69,6 +69,34 @@ def test_limit_acts_inside_the_search():
     assert set(found) == {("A", "P1", "P2", "B"), ("A", "Q1", "Q2", "B")}
 
 
+def _two_routes(extra_on_x):
+    graph = nx.Graph()
+    graph.add_edge("A", "X", w=1.0)
+    graph.add_edge("X", "B", w=1.0 + extra_on_x)
+    graph.add_edge("A", "Y", w=1.0)
+    graph.add_edge("Y", "B", w=1.0)
+    return graph
+
+
+def test_costs_equal_to_twelve_figures_tie_and_go_to_node_order():
+    """The documented policy: costs within 12 significant figures are a tie."""
+    found = _k_shortest_within_hops(_two_routes(1e-14), "A", "B", "w", 2, 3)
+    assert found == [("A", "X", "B"), ("A", "Y", "B")]
+
+
+def test_costs_that_differ_beyond_rounding_are_ordered_by_cost():
+    found = _k_shortest_within_hops(_two_routes(1e-6), "A", "B", "w", 2, 3)
+    assert found == [("A", "Y", "B"), ("A", "X", "B")]
+
+
+def test_equal_costs_go_to_fewer_hops():
+    graph = nx.Graph()
+    graph.add_edge("A", "B", w=2.0)
+    graph.add_edge("A", "M", w=1.0)
+    graph.add_edge("M", "B", w=1.0)
+    assert _k_shortest_within_hops(graph, "A", "B", "w", 2, 3) == [("A", "B"), ("A", "M", "B")]
+
+
 def test_ties_do_not_depend_on_edge_order():
     edges = [("A", "X", 40.0), ("X", "B", 40.0), ("A", "Y", 40.0), ("Y", "B", 40.0),
              ("A", "Z", 40.0), ("Z", "B", 40.0)]

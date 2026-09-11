@@ -56,10 +56,9 @@ import numpy as np
 import pandas as pd
 
 from _common import RESULTS, save_frame
-import qrp.model as model_module
-from qrp import physics
+from qrp import physics, waiting
 from qrp.hardware import TCENTRE_MIDRANGE, TCENTRE_PROJECTED, hardware_from_sweep
-from qrp.model import NetworkConfig, log_width_grid
+from qrp.model import NetworkConfig, build_model, log_width_grid
 from qrp.paths import enumerate_paths, path_statistics
 from qrp.solver import solve
 from qrp.sweep import latin_hypercube_points
@@ -67,7 +66,9 @@ from qrp.topology import build_ca9
 
 UNLIMITED = 10**6
 SERVE_BONUS = 1000.0
-C_FIBRE = physics.C_FIBRE_KM_PER_S
+#: Gate and clock per variant. Storage gates run inside the model as
+#: coherence_model="waiting_gate"; the slowest-link gate has no model option
+#: and goes through build_model's candidate_filter.
 VARIANTS = {
     "storage_heralded": ("storage", "heralded"),
     "storage_source": ("storage", "source"),
@@ -75,7 +76,6 @@ VARIANTS = {
 }
 PRIMARY = "storage_heralded"
 LINES: list[str] = []
-_ORIGINAL_BUILD = model_module.build_candidates
 
 
 def say(text: str = "") -> None:
@@ -88,20 +88,13 @@ def say(text: str = "") -> None:
 # --------------------------------------------------------------------------
 
 
-def expected_max_exponential(lams: list[float]) -> float:
-    """E[max] of independent exponentials, by integrating the survival function."""
-    lam = np.asarray(lams, dtype=float)
-    if len(lam) == 1:
-        return float(1.0 / lam[0])
-    t = np.geomspace(1e-4 / lam.max(), 60.0 / lam.min(), 4000)
-    survival = 1.0 - np.prod(1.0 - np.exp(-np.outer(t, lam)), axis=1)
-    return float(t[0] + np.trapezoid(survival, t))
-
-
 def waiting_table(paths, hardware, widths) -> dict:
-    """(path nodes, width, clock) -> (storage seconds, slowest-link seconds)."""
+    """(path nodes, width, clock) -> (storage seconds, slowest-link seconds).
+
+    The formulas are qrp.waiting's, the same ones the model applies under
+    ``coherence_model="waiting_gate"``.
+    """
     table = {}
-    rate = hardware.generation_rate_hz
     for pair_paths in paths.values():
         for path in pair_paths:
             probs = [physics.link_success(L, hardware.alpha_db_per_km, hardware.eta_emission,
@@ -109,18 +102,11 @@ def waiting_table(paths, hardware, widths) -> dict:
                      for L in path.link_lengths_km]
             tau_e2e = physics.tau_e2e(path.link_lengths_km)
             for w in widths:
-                per_round = [physics.link_success_multiplexed(p, w) for p in probs]
-                for clock in ("heralded", "source"):
-                    lams = []
-                    for L, P in zip(path.link_lengths_km, per_round):
-                        tau = 1.0 / rate
-                        if clock == "heralded":
-                            tau = max(tau, 2.0 * L / C_FIBRE)
-                        lams.append(-math.log1p(-P) / tau if P < 1.0 else 1e15)
-                    e_max = expected_max_exponential(lams)
-                    e_min = 1.0 / sum(lams)
-                    storage = e_max - e_min + tau_e2e
-                    slowest = max(1.0 / lam for lam in lams)
+                for clock in waiting.WAITING_CLOCKS:
+                    lams = waiting.link_ready_rates(path.link_lengths_km, probs, w,
+                                                    hardware.generation_rate_hz, clock)
+                    storage = waiting.expected_storage_time(lams, tau_e2e)
+                    slowest = float(np.max(1.0 / lams))
                     table[(path.nodes, w, clock)] = (storage, slowest)
     return table
 
@@ -137,8 +123,23 @@ def allowed_set(table, t2, variant) -> set:
 # --------------------------------------------------------------------------
 
 
-def solve_plan(topo, paths, hardware, rate_model, budget, memories, width_grid, allowed,
-               time_limit_s, mip_gap, serve_bonus):
+def solve_plan(topo, paths, hardware, rate_model, budget, memories, width_grid, variant,
+               allowed, time_limit_s, mip_gap, serve_bonus):
+    """Solve one plan. ``variant`` is None for the paper's gates, or a VARIANTS key.
+
+    Storage gates run inside the model as coherence_model="waiting_gate" with
+    the variant's clock. The slowest-link gate has no model option, so it
+    passes its precomputed ``allowed`` set through build_model's
+    candidate_filter.
+    """
+    coherence_model, clock, candidate_filter = "paper", "heralded", None
+    if variant is not None:
+        gate, clock = VARIANTS[variant]
+        if gate == "storage":
+            coherence_model = "waiting_gate"
+        else:
+            def candidate_filter(c):
+                return (c.path.nodes, c.width) in allowed
     config = NetworkConfig(
         repeater_memories=memories,
         endnode_memories=memories,
@@ -147,16 +148,10 @@ def solve_plan(topo, paths, hardware, rate_model, budget, memories, width_grid, 
         use_demand_weights=False,
         rate_model=rate_model,
         width_grid=width_grid,
+        coherence_model=coherence_model,
+        waiting_clock=clock,
     )
-    if allowed is not None:
-        def gated(paths_, hardware_, config_, demand_weight=None):
-            return [c for c in _ORIGINAL_BUILD(paths_, hardware_, config_, demand_weight=demand_weight)
-                    if (c.path.nodes, c.width) in allowed]
-        model_module.build_candidates = gated
-    try:
-        built = model_module.build_model(topo, paths, hardware, config)
-    finally:
-        model_module.build_candidates = _ORIGINAL_BUILD
+    built = build_model(topo, paths, hardware, config, candidate_filter=candidate_filter)
 
     if built is None:
         return {"status": "optimal", "chosen": frozenset(), "cands": {}}
@@ -235,17 +230,17 @@ def run_point(topo, paths, point, budgets, memories, width_grid, variants, time_
     table = waiting_table(paths, hardware, config_widths)
     allowed = {v: allowed_set(table, t2, v) for v in variants}
 
-    def solve_for(rate_model, budget, allowed_keys):
+    def solve_for(rate_model, budget, variant=None):
         return solve_plan(topo, paths, hardware, rate_model, budget, memories, width_grid,
-                          allowed_keys, time_limit_s, mip_gap, serve_bonus)
+                          variant, allowed.get(variant), time_limit_s, mip_gap, serve_bonus)
 
     records, details = [], []
     for budget in budgets:
-        plans = {"base_paper": solve_for("paper", budget, None),
-                 "base_coord": solve_for("coordinated", budget, None)}
+        plans = {"base_paper": solve_for("paper", budget),
+                 "base_coord": solve_for("coordinated", budget)}
         for v in variants:
-            plans[f"wait_paper_{v}"] = solve_for("paper", budget, allowed[v])
-            plans[f"wait_coord_{v}"] = solve_for("coordinated", budget, allowed[v])
+            plans[f"wait_paper_{v}"] = solve_for("paper", budget, v)
+            plans[f"wait_coord_{v}"] = solve_for("coordinated", budget, v)
 
         base = plans["base_paper"]
         record = {"point": point["id"], "source": point["source"], **point["values"],

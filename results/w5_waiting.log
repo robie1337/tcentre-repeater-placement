@@ -2,53 +2,54 @@
 W5: DOES THE COHERENCE GATE NEED TO BOUND WAITING TIME?
 ==============================================================================
    objective: published (serving optional)
+   candidate paths (candidates): 549 candidate paths over 18 pairs (8 to 71 per pair), hop counts 1 to 20
 
 -- 1. Memory ceiling 100: 122 points x 3 budgets x 8 plans
-   done in 5.5 min; 0 instances with a non-optimal solve
+   done in 16.4 min; 0 instances with a non-optimal solve
 
    Presets:
    midrange  budget unlimited | published plan 12 pairs 54 repeaters
-     storage_heralded   unreachable in published plan 11 (median wait/T2 2.74) | waiting-aware plan, paper rates  3p  7r [served_and_memory] | buffered rates  3p  7r [served_and_memory]
+     storage_heralded   unreachable in published plan 11 (median wait/T2 3.38) | waiting-aware plan, paper rates  3p  7r [served_and_memory] | buffered rates  3p  7r [served_and_memory]
      storage_source     unreachable in published plan  1 (median wait/T2 0.63) | waiting-aware plan, paper rates 11p 53r [served_and_memory] | buffered rates 11p 53r [served_and_memory]
-     slowest_heralded   unreachable in published plan  6 (median wait/T2 1.03) | waiting-aware plan, paper rates  7p 30r [served_and_memory] | buffered rates  7p 30r [served_and_memory]
+     slowest_heralded   unreachable in published plan  7 (median wait/T2 1.17) | waiting-aware plan, paper rates  7p 30r [served_and_memory] | buffered rates  7p 30r [served_and_memory]
    midrange  budget        20 | published plan  7 pairs 18 repeaters
-     storage_heralded   unreachable in published plan  4 (median wait/T2 1.84) | waiting-aware plan, paper rates  3p  7r [served_and_memory] | buffered rates  3p  7r [served_and_memory]
+     storage_heralded   unreachable in published plan  4 (median wait/T2 1.58) | waiting-aware plan, paper rates  3p  7r [served_and_memory] | buffered rates  3p  7r [served_and_memory]
      storage_source     unreachable in published plan  0 (median wait/T2 0.49) | waiting-aware plan, paper rates  7p 18r [memory_only] | buffered rates  7p 18r [memory_only]
-     slowest_heralded   unreachable in published plan  1 (median wait/T2 0.61) | waiting-aware plan, paper rates  6p 20r [routing] | buffered rates  6p 20r [routing]
+     slowest_heralded   unreachable in published plan  2 (median wait/T2 0.46) | waiting-aware plan, paper rates  6p 20r [routing] | buffered rates  6p 20r [routing]
    midrange  budget        10 | published plan  5 pairs 10 repeaters
      storage_heralded   unreachable in published plan  3 (median wait/T2 2.20) | waiting-aware plan, paper rates  3p  7r [routing] | buffered rates  3p  7r [routing]
-     storage_source     unreachable in published plan  1 (median wait/T2 0.49) | waiting-aware plan, paper rates  4p  9r [served_and_memory] | buffered rates  4p  9r [served_and_memory]
+     storage_source     unreachable in published plan  1 (median wait/T2 0.49) | waiting-aware plan, paper rates  4p  9r [served_set_only] | buffered rates  4p  9r [served_and_memory]
      slowest_heralded   unreachable in published plan  1 (median wait/T2 0.88) | waiting-aware plan, paper rates  4p  9r [served_set_only] | buffered rates  4p  9r [served_set_only]
    projected budget unlimited | published plan 18 pairs 47 repeaters
-     storage_heralded   unreachable in published plan  1 (median wait/T2 0.54) | waiting-aware plan, paper rates 17p 47r [routing] | buffered rates 17p 47r [routing]
-     storage_source     unreachable in published plan  0 (median wait/T2 0.07) | waiting-aware plan, paper rates 18p 47r [memory_only] | buffered rates 18p 47r [memory_only]
-     slowest_heralded   unreachable in published plan  1 (median wait/T2 0.18) | waiting-aware plan, paper rates 17p 47r [routing] | buffered rates 17p 47r [routing]
+     storage_heralded   unreachable in published plan  1 (median wait/T2 0.52) | waiting-aware plan, paper rates 17p 47r [routing] | buffered rates 17p 47r [routing]
+     storage_source     unreachable in published plan  0 (median wait/T2 0.07) | waiting-aware plan, paper rates 18p 47r [identical] | buffered rates 18p 47r [routing]
+     slowest_heralded   unreachable in published plan  1 (median wait/T2 0.16) | waiting-aware plan, paper rates 17p 47r [routing] | buffered rates 17p 47r [routing]
    projected budget        20 | published plan 11 pairs 20 repeaters
-     storage_heralded   unreachable in published plan  0 (median wait/T2 0.50) | waiting-aware plan, paper rates 11p 20r [memory_only] | buffered rates 11p 20r [memory_only]
-     storage_source     unreachable in published plan  0 (median wait/T2 0.06) | waiting-aware plan, paper rates 11p 20r [memory_only] | buffered rates 11p 20r [memory_only]
+     storage_heralded   unreachable in published plan  0 (median wait/T2 0.36) | waiting-aware plan, paper rates 11p 20r [identical] | buffered rates 11p 20r [memory_only]
+     storage_source     unreachable in published plan  0 (median wait/T2 0.06) | waiting-aware plan, paper rates 11p 20r [identical] | buffered rates 11p 20r [identical]
      slowest_heralded   unreachable in published plan  0 (median wait/T2 0.12) | waiting-aware plan, paper rates 11p 20r [identical] | buffered rates 11p 20r [memory_only]
    projected budget        10 | published plan  5 pairs 10 repeaters
      storage_heralded   unreachable in published plan  1 (median wait/T2 0.13) | waiting-aware plan, paper rates  4p  9r [served_and_memory] | buffered rates  4p  9r [served_and_memory]
-     storage_source     unreachable in published plan  0 (median wait/T2 0.04) | waiting-aware plan, paper rates  5p 10r [memory_only] | buffered rates  5p 10r [identical]
-     slowest_heralded   unreachable in published plan  1 (median wait/T2 0.05) | waiting-aware plan, paper rates  4p  9r [served_set_only] | buffered rates  4p  9r [served_set_only]
+     storage_source     unreachable in published plan  0 (median wait/T2 0.04) | waiting-aware plan, paper rates  5p 10r [identical] | buffered rates  5p 10r [identical]
+     slowest_heralded   unreachable in published plan  1 (median wait/T2 0.05) | waiting-aware plan, paper rates  4p  9r [served_and_memory] | buffered rates  4p  9r [served_set_only]
 
    memory 100, gate 'storage_heralded', buffered rates (both corrections), Latin hypercube points:
       budget |    n | published plan has an unreachable pair | pairs unreachable: mean  max | plan changes | routing | served | memory | coverage lost: mean  max
    unlimited |  120 |   96 ( 80%)                          |                   4.97   15 |  103 ( 86%) |       6 |     94 |      3 |               4.03   13
-          20 |  120 |   86 ( 72%)                          |                   2.76    9 |   99 ( 82%) |       9 |     80 |     10 |               2.23    7
-          10 |  120 |   82 ( 68%)                          |                   1.37    4 |   84 ( 70%) |      30 |     53 |      1 |               1.27    3
+          20 |  120 |   85 ( 71%)                          |                   2.74    9 |  101 ( 84%) |       9 |     80 |     12 |               2.23    7
+          10 |  120 |   82 ( 68%)                          |                   1.39    4 |   85 ( 71%) |      30 |     53 |      2 |               1.27    3
    same gate, Eq. (2) rates (gate only):
       budget |    n | published plan has an unreachable pair | pairs unreachable: mean  max | plan changes | routing | served | memory | coverage lost: mean  max
    unlimited |  120 |   96 ( 80%)                          |                   4.97   15 |  101 ( 84%) |       7 |     87 |      7 |               3.83   13
-          20 |  120 |   86 ( 72%)                          |                   2.76    9 |  101 ( 84%) |       8 |     75 |     18 |               2.12    7
-          10 |  120 |   82 ( 68%)                          |                   1.37    4 |   83 ( 69%) |      25 |     57 |      1 |               1.23    3
+          20 |  120 |   85 ( 71%)                          |                   2.74    9 |  100 ( 83%) |       8 |     75 |     17 |               2.12    7
+          10 |  120 |   82 ( 68%)                          |                   1.39    4 |   85 ( 71%) |      25 |     57 |      3 |               1.23    3
      Direction of the change, both corrections:
-     over 286 changed instances (waiting-aware minus published):
-       pairs served                     mean    -3.16 | lower  272 | same   14 | higher    0
-       repeaters built                  mean   -10.78 | lower  255 | same   26 | higher    5
-       mean hops, pairs both serve      mean    +0.02 | lower   13 | same  202 | higher   32
-       mean worst link km, both serve   mean    -0.28 | lower   32 | same  202 | higher   13
-       mean width, pairs both serve     mean   +24.90 | lower    2 | same   57 | higher  188
+     over 289 changed instances (waiting-aware minus published):
+       pairs served                     mean    -3.13 | lower  272 | same   17 | higher    0
+       repeaters built                  mean   -10.65 | lower  255 | same   28 | higher    6
+       mean hops, pairs both serve      mean    +0.02 | lower   13 | same  205 | higher   32
+       mean worst link km, both serve   mean    -0.27 | lower   31 | same  205 | higher   14
+       mean width, pairs both serve     mean   +24.60 | lower    2 | same   63 | higher  185
        site-set overlap (Jaccard)       median 0.40 | min 0.00
      Share of points (unlimited budget) whose published plan has an unreachable pair:
      T2 < 5 ms: 60% of 42 | 5-20 ms: 100% of 36 | > 20 ms: 83% of 42
@@ -56,50 +57,50 @@ W5: DOES THE COHERENCE GATE NEED TO BOUND WAITING TIME?
 
    memory 100, gate 'storage_source', buffered rates (both corrections), Latin hypercube points:
       budget |    n | published plan has an unreachable pair | pairs unreachable: mean  max | plan changes | routing | served | memory | coverage lost: mean  max
-   unlimited |  120 |   46 ( 38%)                          |                   1.36   12 |   90 ( 75%) |       2 |     61 |     27 |               1.45    9
-          20 |  120 |   41 ( 34%)                          |                   0.79    8 |   86 ( 72%) |      11 |     41 |     34 |               0.84    5
-          10 |  120 |   61 ( 51%)                          |                   0.62    3 |   70 ( 58%) |      24 |     38 |      8 |               0.71    3
+   unlimited |  120 |   45 ( 38%)                          |                   1.36   12 |   87 ( 72%) |       2 |     61 |     24 |               1.44    9
+          20 |  120 |   41 ( 34%)                          |                   0.77    8 |   87 ( 72%) |      11 |     41 |     35 |               0.84    5
+          10 |  120 |   61 ( 51%)                          |                   0.61    3 |   70 ( 58%) |      24 |     38 |      8 |               0.71    3
    same gate, Eq. (2) rates (gate only):
       budget |    n | published plan has an unreachable pair | pairs unreachable: mean  max | plan changes | routing | served | memory | coverage lost: mean  max
-   unlimited |  120 |   46 ( 38%)                          |                   1.36   12 |   87 ( 72%) |       1 |     41 |     45 |               1.00    9
-          20 |  120 |   41 ( 34%)                          |                   0.79    8 |   79 ( 66%) |       2 |     29 |     48 |               0.53    5
-          10 |  120 |   61 ( 51%)                          |                   0.62    3 |   71 ( 59%) |      16 |     45 |     10 |               0.63    3
+   unlimited |  120 |   45 ( 38%)                          |                   1.36   12 |   86 ( 72%) |       1 |     41 |     44 |               1.00    9
+          20 |  120 |   41 ( 34%)                          |                   0.77    8 |   82 ( 68%) |       2 |     29 |     51 |               0.53    5
+          10 |  120 |   61 ( 51%)                          |                   0.61    3 |   73 ( 61%) |      16 |     45 |     12 |               0.63    3
      Direction of the change, both corrections:
-     over 246 changed instances (waiting-aware minus published):
-       pairs served                     mean    -1.46 | lower  176 | same   70 | higher    0
-       repeaters built                  mean    -4.52 | lower  158 | same   78 | higher   10
-       mean hops, pairs both serve      mean    +0.04 | lower   10 | same  196 | higher   25
-       mean worst link km, both serve   mean    -2.46 | lower   27 | same  194 | higher   10
-       mean width, pairs both serve     mean    +8.61 | lower    2 | same  120 | higher  109
+     over 244 changed instances (waiting-aware minus published):
+       pairs served                     mean    -1.47 | lower  176 | same   68 | higher    0
+       repeaters built                  mean    -4.51 | lower  157 | same   76 | higher   11
+       mean hops, pairs both serve      mean    +0.04 | lower   10 | same  194 | higher   25
+       mean worst link km, both serve   mean    -2.48 | lower   26 | same  192 | higher   11
+       mean width, pairs both serve     mean    +8.62 | lower    2 | same  120 | higher  107
        site-set overlap (Jaccard)       median 0.73 | min 0.00
      Share of points (unlimited budget) whose published plan has an unreachable pair:
-     T2 < 5 ms: 40% of 42 | 5-20 ms: 67% of 36 | > 20 ms: 12% of 42
-     rate < 10 kHz: 57% of 53 | 10-50 kHz: 29% of 35 | > 50 kHz: 19% of 32
+     T2 < 5 ms: 38% of 42 | 5-20 ms: 67% of 36 | > 20 ms: 12% of 42
+     rate < 10 kHz: 57% of 53 | 10-50 kHz: 29% of 35 | > 50 kHz: 16% of 32
 
    memory 100, gate 'slowest_heralded', buffered rates (both corrections), Latin hypercube points:
       budget |    n | published plan has an unreachable pair | pairs unreachable: mean  max | plan changes | routing | served | memory | coverage lost: mean  max
-   unlimited |  120 |   51 ( 42%)                          |                   1.83   10 |   85 ( 71%) |       8 |     60 |     17 |               1.76    7
-          20 |  120 |   39 ( 32%)                          |                   0.83    5 |   81 ( 68%) |      13 |     43 |     25 |               0.84    4
-          10 |  120 |   60 ( 50%)                          |                   0.68    3 |   65 ( 54%) |      29 |     33 |      3 |               0.71    2
+   unlimited |  120 |   52 ( 43%)                          |                   1.84   11 |   84 ( 70%) |       8 |     60 |     16 |               1.76    7
+          20 |  120 |   40 ( 33%)                          |                   0.80    5 |   85 ( 71%) |      13 |     43 |     29 |               0.84    4
+          10 |  120 |   60 ( 50%)                          |                   0.65    3 |   63 ( 52%) |      29 |     33 |      1 |               0.71    2
    same gate, Eq. (2) rates (gate only):
       budget |    n | published plan has an unreachable pair | pairs unreachable: mean  max | plan changes | routing | served | memory | coverage lost: mean  max
-   unlimited |  120 |   51 ( 42%)                          |                   1.83   10 |   79 ( 66%) |       8 |     41 |     30 |               1.27    7
-          20 |  120 |   39 ( 32%)                          |                   0.83    5 |   77 ( 64%) |       6 |     29 |     42 |               0.53    3
-          10 |  120 |   60 ( 50%)                          |                   0.68    3 |   63 ( 52%) |      22 |     38 |      3 |               0.63    2
+   unlimited |  120 |   52 ( 43%)                          |                   1.84   11 |   81 ( 68%) |       8 |     41 |     32 |               1.27    7
+          20 |  120 |   40 ( 33%)                          |                   0.80    5 |   78 ( 65%) |       6 |     29 |     43 |               0.53    3
+          10 |  120 |   60 ( 50%)                          |                   0.65    3 |   62 ( 52%) |      22 |     38 |      2 |               0.63    2
      Direction of the change, both corrections:
-     over 231 changed instances (waiting-aware minus published):
-       pairs served                     mean    -1.72 | lower  184 | same   47 | higher    0
-       repeaters built                  mean    -5.56 | lower  165 | same   53 | higher   13
-       mean hops, pairs both serve      mean    +0.06 | lower   13 | same  181 | higher   37
-       mean worst link km, both serve   mean    -3.07 | lower   37 | same  181 | higher   13
-       mean width, pairs both serve     mean    +8.54 | lower    0 | same   97 | higher  134
+     over 232 changed instances (waiting-aware minus published):
+       pairs served                     mean    -1.71 | lower  184 | same   48 | higher    0
+       repeaters built                  mean    -5.53 | lower  165 | same   54 | higher   13
+       mean hops, pairs both serve      mean    +0.06 | lower   13 | same  182 | higher   37
+       mean worst link km, both serve   mean    -3.05 | lower   37 | same  182 | higher   13
+       mean width, pairs both serve     mean    +8.62 | lower    0 | same   99 | higher  133
        site-set overlap (Jaccard)       median 0.73 | min 0.28
      Share of points (unlimited budget) whose published plan has an unreachable pair:
-     T2 < 5 ms: 26% of 42 | 5-20 ms: 94% of 36 | > 20 ms: 14% of 42
-     rate < 10 kHz: 36% of 53 | 10-50 kHz: 46% of 35 | > 50 kHz: 50% of 32
+     T2 < 5 ms: 26% of 42 | 5-20 ms: 97% of 36 | > 20 ms: 14% of 42
+     rate < 10 kHz: 36% of 53 | 10-50 kHz: 49% of 35 | > 50 kHz: 50% of 32
 
 -- 2. Memory ceiling 2048, primary gate only: can buying memory recover the plan?
-   done in 1.1 min
+   done in 11.1 min
 
    Presets:
    midrange  budget unlimited | published plan 14 pairs 55 repeaters
@@ -111,28 +112,28 @@ W5: DOES THE COHERENCE GATE NEED TO BOUND WAITING TIME?
    projected budget unlimited | published plan 18 pairs 47 repeaters
      storage_heralded   unreachable in published plan  1 (median wait/T2 0.08) | waiting-aware plan, paper rates 17p 47r [routing] | buffered rates 17p 47r [routing]
    projected budget        20 | published plan 11 pairs 20 repeaters
-     storage_heralded   unreachable in published plan  0 (median wait/T2 0.09) | waiting-aware plan, paper rates 11p 20r [memory_only] | buffered rates 11p 20r [memory_only]
-   projected budget        10 | published plan  5 pairs 10 repeaters
-     storage_heralded   unreachable in published plan  1 (median wait/T2 0.04) | waiting-aware plan, paper rates  5p 10r [routing] | buffered rates  5p 10r [routing]
+     storage_heralded   unreachable in published plan  0 (median wait/T2 0.09) | waiting-aware plan, paper rates 11p 20r [memory_only] | buffered rates 11p 20r [identical]
+   projected budget        10 | published plan 11 pairs 10 repeaters
+     storage_heralded   unreachable in published plan  9 (median wait/T2 9.61) | waiting-aware plan, paper rates  5p 10r [routing] | buffered rates  5p 10r [routing]
 
    memory 2048, gate 'storage_heralded', buffered rates (both corrections), Latin hypercube points:
       budget |    n | published plan has an unreachable pair | pairs unreachable: mean  max | plan changes | routing | served | memory | coverage lost: mean  max
    unlimited |   10 |    4 ( 40%)                          |                   0.90    3 |    5 ( 50%) |       0 |      5 |      0 |               1.20    3
-          20 |   10 |    3 ( 30%)                          |                   0.70    3 |    4 ( 40%) |       3 |      1 |      0 |               0.50    2
-          10 |   10 |    8 ( 80%)                          |                   0.90    2 |    8 ( 80%) |       3 |      5 |      0 |               0.70    2
+          20 |   10 |    4 ( 40%)                          |                   1.00    3 |    6 ( 60%) |       4 |      1 |      1 |               0.70    2
+          10 |   10 |    8 ( 80%)                          |                   1.30    5 |    8 ( 80%) |       3 |      5 |      0 |               0.90    2
    same gate, Eq. (2) rates (gate only):
       budget |    n | published plan has an unreachable pair | pairs unreachable: mean  max | plan changes | routing | served | memory | coverage lost: mean  max
    unlimited |   10 |    4 ( 40%)                          |                   0.90    3 |    5 ( 50%) |       0 |      4 |      1 |               0.80    3
-          20 |   10 |    3 ( 30%)                          |                   0.70    3 |    4 ( 40%) |       2 |      1 |      1 |               0.40    2
-          10 |   10 |    8 ( 80%)                          |                   0.90    2 |    8 ( 80%) |       3 |      5 |      0 |               0.70    2
+          20 |   10 |    4 ( 40%)                          |                   1.00    3 |    4 ( 40%) |       3 |      1 |      0 |               0.60    2
+          10 |   10 |    8 ( 80%)                          |                   1.30    5 |    8 ( 80%) |       3 |      5 |      0 |               0.90    2
      Direction of the change, both corrections:
-     over 17 changed instances (waiting-aware minus published):
-       pairs served                     mean    -1.41 | lower   15 | same    2 | higher    0
-       repeaters built                  mean    -1.88 | lower   12 | same    4 | higher    1
-       mean hops, pairs both serve      mean    +0.03 | lower    1 | same   14 | higher    2
-       mean worst link km, both serve   mean    -1.35 | lower    3 | same   11 | higher    3
-       mean width, pairs both serve     mean   +56.56 | lower    1 | same    9 | higher    7
-       site-set overlap (Jaccard)       median 0.90 | min 0.42
+     over 19 changed instances (waiting-aware minus published):
+       pairs served                     mean    -1.47 | lower   17 | same    2 | higher    0
+       repeaters built                  mean    -1.68 | lower   12 | same    6 | higher    1
+       mean hops, pairs both serve      mean    +0.13 | lower    1 | same   14 | higher    4
+       mean worst link km, both serve   mean    -3.24 | lower    5 | same   12 | higher    2
+       mean width, pairs both serve     mean   +71.78 | lower    0 | same    9 | higher   10
+       site-set overlap (Jaccard)       median 0.90 | min 0.33
      Share of points (unlimited budget) whose published plan has an unreachable pair:
      T2 < 5 ms: 0% of 2 | 5-20 ms: 75% of 4 | > 20 ms: 25% of 4
      rate < 10 kHz: 0% of 3 | 10-50 kHz: 60% of 5 | > 50 kHz: 50% of 2

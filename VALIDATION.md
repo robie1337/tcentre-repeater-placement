@@ -147,7 +147,7 @@ defined value it never holds, median 0.033.
 
 This is reported as a finding rather than fixed silently, because it is the
 main result. Three rate models are implemented so that the conclusion can be
-tested against the assumption: the paper's own, a memoryless floor, and a
+tested against the assumption: the paper's own, a memoryless model, and a
 buffered model valid at low success probability. The parameter ranking
 survives all three.
 
@@ -211,8 +211,8 @@ assumes a nuclear memory, and the report has to say which memory it means.
 
 An anonymous review of the repository found that two parts of the code did
 not do what the documentation said. Both are fixed and tested. Rerunning the
-affected results began on 11 September 2026. So far the preset CA9 solves
-and W6 have been rerun. W4, W5, the site-spacing check and the Sobol sweeps
+affected results began on 11 September 2026. So far the preset CA9 solves,
+W5 and W6 have been rerun. W4, the site-spacing check and the Sobol sweeps
 have not, and the answers below that would depend on them are left out until
 they are.
 
@@ -296,6 +296,17 @@ waiting-time result that depends on which tie the solver returns is an
 argument for putting waiting time inside the optimisation rather than
 scoring it afterwards.
 
+W5, rerun with a 900 s limit and every solve optimal, gives the same shares
+of published plans with an unreachable pair as before, within one point in
+every cell: 80, 71 and 68 per cent under the strictest gate at unlimited,
+20 and 10 repeaters. One preset did change. With 2048 memories, projected
+hardware and a budget of 10, the published plan now serves 11 pairs instead
+of 5 with the same 10 repeaters, because the larger candidate set offers
+routes with fewer, longer links. Nine of those 11 pairs fail the waiting
+gate, against one of 5 before, and the waiting-aware plan serves 5 either
+way. The published objective rewards those routes because it cannot see
+waiting time.
+
 ### Answers to the review's questions
 
 1. **Can the old path pruning be proven exact for the full MILP?** No.
@@ -322,6 +333,18 @@ scoring it afterwards.
    Gurobi licence raised an exception instead of reporting. None of the
    committed result files records such a solve, apart from the 18 W4 errors
    already excluded from that analysis.
+
+6. **How much does waiting-aware coherence change the main results?** It
+   depends on how waiting is modelled. As a hard cut-off, mean storage time no
+   longer than T2, it makes 68 to 80 per cent of published plans contain an
+   unreachable pair across the sampled hardware box, but at the measured
+   nuclear T2 of 112 ms it removes no midrange pair and one projected pair.
+   As gradual decay at 112 ms it matters at every budget tested. At unlimited
+   budget the projected plan's mean fidelity falls from 0.980 to 0.631 even
+   under the optimistic swap bound, with 8 of 18 pairs at or below 1/2, and
+   a decay-aware plan serves 14 pairs (6 under the pessimistic bound). Both
+   models are applied in the W5 and W6 scripts, not yet as an option of the
+   model itself, and the Sobol ranking has not been recomputed under either.
 
 9. **Which hardware conclusions remain with defensible gate and readout
    values?** No Bell-state measurement fidelity for T centres has been

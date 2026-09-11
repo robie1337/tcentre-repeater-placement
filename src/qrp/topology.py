@@ -274,14 +274,23 @@ def build_surfnet(
             continue
         graph.add_edge(u, v, length_km=length, corridor=(u, v))
 
-    # Match the requested end nodes against the file's own labels.
+    # Match the requested end nodes against the file's own labels. An exact
+    # match (ignoring case) wins; otherwise exactly one label may contain the
+    # name. A missing or ambiguous name raises, so a changed input file cannot
+    # silently change the validation network.
     resolved: dict[str, str] = {}
     for wanted in end_nodes:
-        for node, label in labels.items():
-            if wanted.lower() in label.lower():
-                resolved[wanted] = node
-                graph.nodes[node]["kind"] = "city"
-                break
+        key = wanted.lower()
+        exact = [node for node, label in labels.items() if label.lower() == key]
+        partial = [node for node, label in labels.items() if key in label.lower()]
+        matches = exact or partial
+        if not matches:
+            raise ValueError(f"end node {wanted!r} matches no label in {gml_path}")
+        if len(matches) > 1:
+            found = sorted(labels[n] for n in matches)
+            raise ValueError(f"end node {wanted!r} is ambiguous in {gml_path}: {found}")
+        resolved[wanted] = matches[0]
+        graph.nodes[matches[0]]["kind"] = "city"
 
     cities = tuple(resolved.values())
     sites = tuple(n for n in graph.nodes if n not in set(cities))

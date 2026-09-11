@@ -46,7 +46,7 @@ from dataclasses import dataclass, field
 import numpy as np
 import scipy.sparse as sp
 
-from . import physics
+from . import physics, waiting
 from .hardware import Hardware
 from .paths import CandidatePath
 from .solver import (
@@ -64,6 +64,13 @@ from .topology import Topology
 # --------------------------------------------------------------------------
 # Configuration
 # --------------------------------------------------------------------------
+
+
+#: Rate expressions ``NetworkConfig.rate_model`` accepts.
+RATE_MODELS = ("paper", "coordinated", "ext")
+
+#: Coherence treatments ``NetworkConfig.coherence_model`` accepts.
+COHERENCE_MODELS = ("paper", "waiting_gate", "decay_optimistic", "decay_pessimistic")
 
 
 def log_width_grid(max_width: int, n_points: int = 8) -> tuple[int, ...]:
@@ -101,6 +108,41 @@ class NetworkConfig:
     #: are reference approximations; nothing here proves the physical rate
     #: lies between them. Every sweep record names the model that produced it.
     rate_model: str = "paper"
+    #: How memory coherence gates a path. "paper" applies Eqs. (13) and (14),
+    #: which bound propagation delay only, and reproduces the source paper.
+    #: "waiting_gate" also requires the expected storage time (the wait of the
+    #: first-ready pair for the last link, plus tau_e2e) to fit the shorter
+    #: memory coherence time. "decay_optimistic" and "decay_pessimistic" keep
+    #: the paper's gates and lower each path's fidelity by memory decay during
+    #: that wait, under the two swap-schedule bounds described in
+    #: physics.storage_decay_factor. None of these is a protocol simulation.
+    coherence_model: str = "paper"
+    #: Attempt-round clock for the waiting models: "heralded" means a link
+    #: cannot retry before its herald returns; "source" means one round per
+    #: source attempt. See physics.link_ready_rates.
+    waiting_clock: str = "heralded"
+    #: Monte Carlo samples and seed for the decay expectation.
+    decay_samples: int = 4000
+    decay_seed: int = 20260911
+
+    def __post_init__(self) -> None:
+        if self.paths_per_pair != 1:
+            raise ValueError(
+                "paths_per_pair must be 1. The model counts each chosen route as a served "
+                "pair and adds its utility, so serving one pair over several routes would "
+                "need its own rules for combining rate, fidelity and utility, and none are "
+                "implemented."
+            )
+        if self.rate_model not in RATE_MODELS:
+            raise ValueError(f"unknown rate_model {self.rate_model!r}; choose from {RATE_MODELS}")
+        if self.coherence_model not in COHERENCE_MODELS:
+            raise ValueError(f"unknown coherence_model {self.coherence_model!r};"
+                             f" choose from {COHERENCE_MODELS}")
+        if self.waiting_clock not in waiting.WAITING_CLOCKS:
+            raise ValueError(f"unknown waiting_clock {self.waiting_clock!r};"
+                             f" choose from {waiting.WAITING_CLOCKS}")
+        if self.decay_samples < 1:
+            raise ValueError("decay_samples must be at least 1")
 
     def widths(self) -> tuple[int, ...]:
         if self.width_grid is not None:
@@ -126,6 +168,15 @@ class Candidate:
     p_min: float
     tau_e2e_s: float
     wp_min: float
+    #: Expected storage time in seconds, filled in by the waiting gate.
+    storage_s: float = float("nan")
+    #: Factor on the Werner parameter from memory decay, 1.0 without decay.
+    decay_factor: float = 1.0
+
+
+#: Sample columns for the decay expectation. A path uses its first h columns,
+#: so a fixed width keeps each path's factor independent of the longest path.
+DECAY_SAMPLE_COLUMNS = 20
 
 
 def build_candidates(
@@ -139,10 +190,23 @@ def build_candidates(
     A combination is dropped when the round-trip time on its longest link
     exceeds the repeater coherence time, when its end-to-end time exceeds the
     end-node coherence time, or when its utility is not finite (fidelity at or
-    below the classical floor of 1/2).
+    below the classical floor of 1/2). ``config.coherence_model`` can add a
+    waiting-time gate, or lower each combination's fidelity by memory decay
+    during the wait; see NetworkConfig and qrp.waiting.
     """
     widths = config.widths()
     out: list[Candidate] = []
+
+    model = config.coherence_model
+    t2 = min(hardware.t_repeater_memory_s, hardware.t_endnode_memory_s)
+    samples = None
+    bound = ""
+    if model.startswith("decay_"):
+        longest = max((p.hops for pair_paths in paths.values() for p in pair_paths), default=1)
+        samples = waiting.unit_exponential_samples(
+            config.decay_samples, max(DECAY_SAMPLE_COLUMNS, longest), config.decay_seed
+        )
+        bound = model.removeprefix("decay_")
 
     for pair, pair_paths in paths.items():
         weight = 1.0
@@ -205,7 +269,23 @@ def build_candidates(
                     )
                 else:
                     raise ValueError(f"unknown rate_model {config.rate_model!r}")
-                u = physics.utility(rate, fidelity)
+
+                storage = float("nan")
+                factor = 1.0
+                width_fidelity = fidelity
+                if model != "paper":
+                    rates = waiting.link_ready_rates(path.link_lengths_km, link_probs, width,
+                                                     hardware.generation_rate_hz,
+                                                     config.waiting_clock)
+                    if model == "waiting_gate":
+                        storage = waiting.expected_storage_time(rates, tau)
+                        if storage > t2:
+                            continue
+                    else:
+                        factor = waiting.storage_decay_factor(rates, tau, t2, samples, bound)
+                        width_fidelity = waiting.decayed_fidelity(fidelity, factor)
+
+                u = physics.utility(rate, width_fidelity)
                 if not np.isfinite(u):
                     continue
                 out.append(
@@ -215,10 +295,12 @@ def build_candidates(
                         width=width,
                         utility=weight * u,
                         rate=rate,
-                        fidelity=fidelity,
+                        fidelity=width_fidelity,
                         p_min=p_min,
                         tau_e2e_s=tau,
                         wp_min=physics.rate_approximation_ratio(width, p_min),
+                        storage_s=storage,
+                        decay_factor=factor,
                     )
                 )
 
@@ -244,6 +326,7 @@ def build_model(
     paths: dict[tuple[str, str], list[CandidatePath]],
     hardware: Hardware,
     config: NetworkConfig,
+    candidate_filter=None,
 ) -> PlacementModel | None:
     """Assemble the MILP.
 
@@ -253,10 +336,16 @@ def build_model(
     second case is what produces the coherence cliff: below a certain T_EM
     every path for some pair violates Eq. (14), so the network cannot serve
     its demand at any repeater budget.
+
+    ``candidate_filter``, if given, is called on every candidate and drops
+    those it returns False for. It exists for sensitivity variants the
+    coherence models do not cover, such as the slowest-link gate in W5.
     """
     candidates = build_candidates(
         paths, hardware, config, demand_weight=topology.demand_weight
     )
+    if candidate_filter is not None:
+        candidates = [c for c in candidates if candidate_filter(c)]
     if not candidates:
         return None
 
@@ -295,7 +384,7 @@ def build_model(
     ub: list[float] = []
     row = 0
 
-    # Eq. (10): one path per user pair.
+    # Eq. (10): one path per user pair, at most one when serving is optional.
     for pair in pairs:
         for j, cand in enumerate(candidates):
             if cand.pair == pair:
@@ -303,7 +392,7 @@ def build_model(
                 cols.append(j)
                 vals.append(1.0)
         lb.append(1.0 if config.require_all_pairs else 0.0)
-        ub.append(float(config.paths_per_pair))
+        ub.append(1.0)
         row += 1
 
     # Eq. (9): repeater memory, and the coupling that forces r[u] = 1.

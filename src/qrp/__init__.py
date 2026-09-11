@@ -29,6 +29,7 @@ _SUBMODULES = (
     "solver",
     "sweep",
     "topology",
+    "waiting",
 )
 
 __all__ = list(_SUBMODULES)

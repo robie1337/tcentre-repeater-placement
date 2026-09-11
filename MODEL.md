@@ -84,7 +84,27 @@ eighth of the variables. Pass `width_grid=tuple(range(1, 101))` to
 
 **The rate formula has a stated regime.** Eq. (2) is valid where
 `W * p_min >> 1`. Every sweep record carries that quantity so results outside
-the regime can be flagged rather than quietly reported.
+the regime can be flagged rather than quietly reported. The paper's rate model
+stays the default so the reproduction holds; the buffered and memoryless
+models test whether conclusions survive outside that regime, and none of the
+three is claimed as a bound on the physical rate.
+
+**Coherence can count the wait, not only propagation.** Eqs. (13) and (14)
+bound propagation delay. At low `W * p` a link needs many attempt rounds, and
+the pair on a link that is ready early sits in memory until the slowest link
+on the path is ready. `NetworkConfig.coherence_model` chooses how that is
+treated. `paper` reproduces the source paper. `waiting_gate` also requires
+the expected storage time, the wait of the first ready pair for the last plus
+`tau_e2e`, to fit the shorter memory coherence time. `decay_optimistic` and
+`decay_pessimistic` keep the paper's gates and lower each path's fidelity by
+memory decay during the wait, under two bounds on the swap schedule: one pair
+waiting from the first link ready to the last, and every pair waiting for the
+last. Link times are independent exponentials on a heralded clock by default
+(`waiting_clock="source"` gives the paper's implicit clock), decay uses the
+idle echo T2, and the decay expectation is a seeded Monte Carlo estimate.
+`qrp.waiting` holds the formulas, and `tests/test_waiting.py` checks them
+against Monte Carlo, an exact integral and harmonic numbers. The swap schedule
+is bounded, not computed, so none of this is a protocol simulation.
 
 **Candidate sites are evenly spaced, not real PoPs.** The operator does not publish
 PoP locations. Sites are placed at uniform 80 km spacing along each corridor.
@@ -100,7 +120,10 @@ on, one unservable pair makes the whole instance infeasible and the result
 says nothing about the other seventeen. With it off, the number of pairs
 served becomes the output and the contour where it drops below eighteen is
 exactly the feasibility boundary. The validation runs, which need the
-infeasibility cliff, keep the requirement on.
+infeasibility cliff, keep the requirement on. Either way a pair gets at most
+one path: `paths_per_pair` other than 1 raises, because serving one pair over
+several routes would need rules for combining rate and fidelity that the
+model does not have.
 
 **A time limit is not infeasibility.** Every solve reports one of `optimal`,
 `feasible_at_limit`, `no_incumbent_at_limit`, `infeasible`, `unbounded`,
