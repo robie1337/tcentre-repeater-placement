@@ -19,7 +19,7 @@ discrete-event simulator.
 | [VALIDATION.md](VALIDATION.md) | every check run against the source paper, and every error found, including ours |
 | [FINDINGS.md](FINDINGS.md) | the results |
 | `src/qrp/` | physics, hardware, topology, paths, model, solver, sweep, sensitivity, figures |
-| `scripts/` | `w1_*` validation, `w1b_*` the O band threshold, `w2_*` sweeps, `w3*` the fixes |
+| `scripts/` | `w1_*` validation, `w1b_*` the O band threshold, `w2_*` sweeps, `w3*` the fixes, `w4_*` to `w6_*` whether the corrections change the plan |
 | `tests/` | 83 tests |
 | `results/`, `figures/` | regenerable output, tracked so the tables can be checked |
 

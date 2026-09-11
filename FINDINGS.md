@@ -112,7 +112,51 @@ served and 0.78 on utility. Swept across the full corrected swap-noise
 bracket [0.71, 0.997] it stays between 0.82 and 0.91, while swap quality
 never exceeds 0.10.
 
+## Whether the corrections change the plan
+
+A biased rate only matters to a planner if it changes what gets built.
+`w4_rate_model_decisions.py` solves each instance under Eq. (2) and under
+the buffered rate model, then scores each plan under the other model. Across
+302 hardware points and seven repeater budgets, with pairs served first so
+the served set does not depend on the time unit, the buffered model changes
+the routing in 2 to 26 per cent of instances, and the plan chosen under
+Eq. (2) loses at most 0.105 bits of log2 utility per pair, about 7.5 per
+cent. The rate equation is outside its regime, but correcting it barely moves
+the plan.
+
+The coherence constraint is a different matter. Eqs. (13) and (14) bound
+propagation delay. Neither counts the time a memory holds one link's pair
+while the other links on the path are still failing, and at `W * p` near 0.03
+that wait runs to tens of attempt rounds. With each round no shorter than the
+light round trip on its link, the expected storage time
+`E[max] - E[min] + tau_e2e` agrees with a 200,000-sample Monte Carlo to
+within 0.15 ms on every path checked.
+
+As a hard cut-off, storage time no longer than T2, this only binds at short
+coherence. `w5_waiting_time.py` finds an unreachable pair in 38 to 80 per
+cent of published plans across 120 sampled points, depending on the gate, but
+at the measured nuclear T2 of 112 ms the cut-off removes nothing at midrange
+and one pair at projected.
+
+As gradual decay it binds at 112 ms too. `w6_memory_decay.py` decays the
+Werner parameter by `exp(-t / T2)` per stored qubit and brackets the swap
+schedule between one pair idling and every pair idling:
+
+| Hardware, T2 = 112 ms | Published plan | One pair idles | Every pair idles |
+|---|---|---|---|
+| Midrange | 12 pairs, mean F 0.785 | F 0.607, 2 pairs at or below 1/2 | F 0.540, 9 pairs |
+| Projected | 18 pairs, mean F 0.980 | F 0.627, 7 pairs | F 0.552, 13 pairs |
+
+Replanning with decay serves 9 and 14 pairs at the optimistic bound, 4 and 6
+at the pessimistic one. Waits well inside T2 still cost fidelity, and on
+routes of 12 to 19 hops the cost compounds.
+
 ## Limits
+
+The waiting-time results rest on three assumptions: a link cannot retry
+before its herald returns, the nuclear memory decays at its idle echo T2
+while the electron keeps attempting, and the swap schedule is bounded rather
+than computed. Each is a question about the hardware, not the model.
 
 The model has not been validated against a discrete-event simulator. No
 comparison was run against other qubit platforms, so nothing here says the
