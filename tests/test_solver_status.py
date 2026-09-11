@@ -76,9 +76,31 @@ class TestCplexMapping:
         ("MIP_unbounded", False, UNBOUNDED),
         ("something_unrecognised", False, ERROR),
         ("something_unrecognised", True, FEASIBLE_AT_LIMIT),
+        # The pip CPLEX names status 102 without the MIP_ prefix.
+        ("optimal_tolerance", True, OPTIMAL),
     ])
     def test_names(self, name, feasible, expected):
         assert _cplex_status(name, feasible) == expected
+
+
+def test_zero_gap_reaches_highs(monkeypatch):
+    """mip_gap=0.0 must be passed on, not dropped in favour of the solver default."""
+    import scipy.optimize
+    import scipy.sparse as sp
+
+    from qrp.solver import MilpProblem, solve
+
+    seen = {}
+
+    def fake_solver(**kwargs):
+        seen.update(kwargs.get("options") or {})
+        return fake_milp(0, x=np.zeros(2), fun=0.0, gap=0.0, bound=0.0)
+
+    monkeypatch.setattr(scipy.optimize, "milp", fake_solver)
+    problem = MilpProblem(c=np.zeros(2), A=sp.csr_matrix((1, 2)), lb=np.array([-np.inf]),
+                          ub=np.array([1.0]), n_vars=2)
+    solve(problem, backend="highs", mip_gap=0.0)
+    assert seen.get("mip_rel_gap") == 0.0
 
 
 def test_gurobi_licence_size_limit_is_too_large():

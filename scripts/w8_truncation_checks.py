@@ -16,7 +16,7 @@ Instances: midrange and projected presets, unlimited budget and budgets of
 width check adds the memoryless model, whose dependence on width is the
 least like log2(W), which is what the eight-point grid was chosen for.
 
-Run:  python scripts/w8_truncation_checks.py [--jobs 6]
+Run:  python scripts/w8_truncation_checks.py [--jobs 6] [--backend gurobi]
 """
 
 from __future__ import annotations
@@ -54,13 +54,15 @@ def budget_label(b: int) -> str:
     return "unlimited" if b >= UNLIMITED else str(b)
 
 
-def solve_instance(topo, paths, check, setting, hardware_key, budget, rate_model, grid_name):
+def solve_instance(topo, paths, check, setting, hardware_key, budget, rate_model, grid_name,
+                   backend="highs"):
     config = NetworkConfig(max_repeaters=budget, require_all_pairs=False, rate_model=rate_model,
                            width_grid=GRIDS[grid_name])
     started = time.perf_counter()
-    result = solve_placement(topo, paths, PRESETS[hardware_key], config,
+    result = solve_placement(topo, paths, PRESETS[hardware_key], config, backend=backend,
                              time_limit_s=TIME_LIMIT_S, mip_gap=1e-6)
     return {
+        "backend": backend,
         "check": check, "setting": setting, "hardware": hardware_key, "budget": budget,
         "rate_model": rate_model, "width_grid": grid_name, "status": result.status,
         "utility": result.utility, "served_pairs": result.served_pairs,
@@ -109,6 +111,7 @@ def report(frame: pd.DataFrame, check: str, reference) -> None:
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--jobs", type=int, default=6)
+    parser.add_argument("--backend", default="highs", choices=["highs", "gurobi", "cplex"])
     args = parser.parse_args()
 
     from joblib import Parallel, delayed
@@ -142,10 +145,10 @@ def main() -> None:
                 for rate in ("paper", "coordinated", "ext"):
                     tasks.append((built[(300.0, 20)], "width_grid", grid, hw, budget, rate, grid))
 
-    say(f"\n   {len(tasks)} solves, time limit {TIME_LIMIT_S:.0f} s each")
+    say(f"\n   {len(tasks)} solves on {args.backend}, time limit {TIME_LIMIT_S:.0f} s each")
     started = time.time()
     rows = Parallel(n_jobs=args.jobs, backend="loky")(
-        delayed(solve_instance)(topo, paths, check, setting, hw, budget, rate, grid)
+        delayed(solve_instance)(topo, paths, check, setting, hw, budget, rate, grid, args.backend)
         for paths, check, setting, hw, budget, rate, grid in tasks
     )
     frame = pd.DataFrame.from_records(rows)

@@ -11,9 +11,10 @@ Two estimates are given, because this machine may be busy with other jobs:
 the times measured here directly, and the committed legacy timings scaled by
 the default-to-legacy ratio measured here, which cancels most of the load.
 Solves on the default set that do not finish inside 60 s are solved again
-with a 900 s limit, to see how long they actually need.
+with a 900 s limit, to see how long they actually need. The committed legacy
+timings were measured with HiGHS; pass --backend to time another solver.
 
-Run:  python scripts/w10_rerun_cost.py [--points 40] [--jobs 6]
+Run:  python scripts/w10_rerun_cost.py [--points 40] [--jobs 6] [--backend gurobi]
 """
 
 from __future__ import annotations
@@ -67,11 +68,12 @@ def committed(name: str) -> pd.DataFrame:
     return pd.read_csv(StringIO(blob), low_memory=False)
 
 
-def solve_point(topo, paths, strategy, rate_model, values, limit_s):
+def solve_point(topo, paths, strategy, rate_model, values, limit_s, backend="highs"):
     context = SweepContext(topology=topo, paths=paths,
                            config=NetworkConfig(require_all_pairs=False, rate_model=rate_model),
-                           base_hardware=TCENTRE_MIDRANGE, time_limit_s=limit_s, mip_gap=1e-4,
-                           path_strategy=strategy, spacing_km=80.0, max_link_km=300.0, max_hops=20)
+                           base_hardware=TCENTRE_MIDRANGE, backend=backend, time_limit_s=limit_s,
+                           mip_gap=1e-4, path_strategy=strategy, spacing_km=80.0,
+                           max_link_km=300.0, max_hops=20)
     record = evaluate(context, values)
     record["limit_s"] = limit_s
     return record
@@ -81,6 +83,7 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--points", type=int, default=40, help="sampled points per rate model")
     parser.add_argument("--jobs", type=int, default=6)
+    parser.add_argument("--backend", default="highs", choices=["highs", "gurobi", "cplex"])
     args = parser.parse_args()
 
     from joblib import Parallel, delayed
@@ -88,6 +91,7 @@ def main() -> None:
     say("=" * 78)
     say("W10: WHAT RERUNNING THE SWEEPS ON THE DEFAULT CANDIDATE SET WILL COST")
     say("=" * 78)
+    say(f"   backend: {args.backend} (the committed legacy timings are HiGHS)")
 
     topo = build_ca9(spacing_km=80.0)
     pairs = topo.demand_pairs()
@@ -111,7 +115,8 @@ def main() -> None:
     say(f"\n   {len(tasks)} solves at the sweeps' {SWEEP_LIMIT_S:.0f} s limit")
     started = time.time()
     records = Parallel(n_jobs=args.jobs, backend="loky")(
-        delayed(solve_point)(topo, path_sets[s], s, rm, v, SWEEP_LIMIT_S) for s, rm, _, v in tasks
+        delayed(solve_point)(topo, path_sets[s], s, rm, v, SWEEP_LIMIT_S, args.backend)
+        for s, rm, _, v in tasks
     )
     for rec, (s, rm, i, _) in zip(records, tasks):
         rec["sample"] = i
@@ -124,13 +129,14 @@ def main() -> None:
         say(f"   {len(slow)} default-set solves not optimal at {SWEEP_LIMIT_S:.0f} s;"
             f" solving them again at {LONG_LIMIT_S:.0f} s")
         again = Parallel(n_jobs=args.jobs, backend="loky")(
-            delayed(solve_point)(topo, path_sets["candidates"], "candidates", t[1], t[3], LONG_LIMIT_S)
+            delayed(solve_point)(topo, path_sets["candidates"], "candidates", t[1], t[3],
+                                 LONG_LIMIT_S, args.backend)
             for t, _ in slow
         )
         for (t, _), rec in zip(slow, again):
             rec["sample"] = t[2]
         frame = pd.concat([frame, pd.DataFrame.from_records(again)], ignore_index=True)
-    save_frame(frame, "w10_rerun_cost.csv")
+    save_frame(frame, f"w10_rerun_cost_{args.backend}.csv")
 
     base = frame[frame["limit_s"] == SWEEP_LIMIT_S]
     say(f"\n   {'rate model':<11} {'path set':<10} | {'median vars':>11} {'median s':>9} {'mean s':>8}"
@@ -185,8 +191,9 @@ def main() -> None:
             f" median {du.median():.3f}, max {du.max():.3f} bits")
 
     say("\n" + "=" * 78)
-    (RESULTS / "w10_rerun_cost.log").write_text("\n".join(LINES) + "\n", encoding="utf-8")
-    print("   wrote results/w10_rerun_cost.log")
+    log_name = f"w10_rerun_cost_{args.backend}.log"
+    (RESULTS / log_name).write_text("\n".join(LINES) + "\n", encoding="utf-8")
+    print(f"   wrote results/{log_name}")
 
 
 if __name__ == "__main__":

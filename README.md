@@ -20,7 +20,7 @@ discrete-event simulator.
 | [FINDINGS.md](FINDINGS.md) | the results |
 | `src/qrp/` | physics, hardware, topology, paths, model, solver, sweep, sensitivity, figures |
 | `scripts/` | `w1_*` validation, `w1b_*` the O band threshold, `w2_*` sweeps, `w3*` the fixes, `w4_*` to `w6_*` whether the corrections change the plan, `w7_*` to `w12_*` checks on the approximations, the solvers, the cost of rerunning, the attempt clock and the swap schedule |
-| `tests/` | 324 tests, including exhaustive and brute-force checks of the candidate path set on small networks |
+| `tests/` | 326 tests, including exhaustive and brute-force checks of the candidate path set on small networks |
 | `results/`, `figures/` | regenerable output, tracked so the tables can be checked |
 
 ## Install and run

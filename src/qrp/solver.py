@@ -145,7 +145,9 @@ def _solve_highs(
     options: dict = {}
     if time_limit_s is not None:
         options["time_limit"] = time_limit_s
-    if mip_gap > 0.0:
+    # A gap of 0.0 must reach the solver: skipping it leaves the solver's own
+    # default of 1e-4 in place, and a solve asked to be exact would not be.
+    if mip_gap is not None:
         options["mip_rel_gap"] = mip_gap
 
     started = time.perf_counter()
@@ -240,7 +242,9 @@ def _solve_gurobi(
     from gurobipy import GRB
 
     params = {"OutputFlag": 0, "Threads": 1}
-    if mip_gap > 0.0:
+    # A gap of 0.0 must reach the solver: skipping it leaves the solver's own
+    # default of 1e-4 in place, and a solve asked to be exact would not be.
+    if mip_gap is not None:
         params["MIPGap"] = mip_gap
     with gp.Env(params=params) as env, gp.Model(env=env) as model:
         try:
@@ -293,7 +297,10 @@ def _solve_gurobi(
 #: machine by adding binaries until it refuses. Error 1016 fires above this.
 CPLEX_COMMUNITY_VAR_LIMIT = 1000
 
-_CPLEX_OPTIMAL = {"MIP_optimal", "MIP_optimal_tolerance", "optimal"}
+#: Names differ between CPLEX releases: the pip Community Edition reports
+#: status 102 as "optimal_tolerance", older tables as "MIP_optimal_tolerance".
+#: Both mean optimal within the requested relative gap.
+_CPLEX_OPTIMAL = {"MIP_optimal", "MIP_optimal_tolerance", "optimal", "optimal_tolerance"}
 _CPLEX_INFEASIBLE = {"MIP_infeasible", "infeasible", "MIP_infeasible_or_unbounded",
                      "infeasible_or_unbounded"}
 _CPLEX_UNBOUNDED = {"MIP_unbounded", "unbounded"}
@@ -370,7 +377,9 @@ def _solve_cplex(
 
     if time_limit_s is not None:
         model.parameters.timelimit.set(time_limit_s)
-    if mip_gap > 0.0:
+    # A gap of 0.0 must reach the solver: skipping it leaves the solver's own
+    # default of 1e-4 in place, and a solve asked to be exact would not be.
+    if mip_gap is not None:
         model.parameters.mip.tolerances.mipgap.set(mip_gap)
 
     started = time.perf_counter()

@@ -97,9 +97,31 @@ variables at the projected preset, and all three solvers returned 200.860328.
 Under the default generator it is 4,454 variables at the same preset and
 2,421 at midrange. HiGHS returns the same 200.860328 on the larger model, but
 both free licences refuse it: CPLEX Community reports `too_large`, and so does
-the size-limited Gurobi licence. Cross-solver agreement on CA9 therefore rests
-on the legacy-sized model, and on the larger one needs a full Gurobi or CPLEX
-licence.
+the size-limited Gurobi licence. Cross-solver agreement on the full default
+model therefore needs a full Gurobi or CPLEX licence. With an academic Gurobi
+licence it holds: solved exactly, Gurobi returns 200.860328 on the 4,454
+variable projected model, as HiGHS does, and 132.174790 at a budget of 20
+repeaters, again matching HiGHS. On this machine Gurobi took 0.4 s and 3.7 s
+for those two instances where HiGHS took minutes.
+
+`w9_solver_agreement.py` checks agreement on models that fit the free
+licences and still use the default path set: CA9 with one width (up to 611
+variables) and with three widths (up to 1,709), plus the legacy model (809).
+It covers the two presets and 10 Latin hypercube points, three budgets, three
+rate models and two coherence models, 648 models in all. HiGHS and Gurobi
+proved all 594 models with candidates optimal, and wherever two solvers both
+reported optimal their objectives agree to within 1.5e-9 relative. CPLEX
+Community refused the 54 three-width models as too large. No solver disagreed
+with another on any objective.
+
+That run exposed two faults in the solver layer, both since fixed and
+tested. The solves were requested as exact, but each backend passed the gap on
+only when it was positive, so a gap of zero left every solver at its own
+default of 1e-4. And CPLEX names status 102 "optimal_tolerance" in this
+release, which the layer did not recognise, so 8 CPLEX solves that had in fact
+reached the same optimum as HiGHS and Gurobi were recorded as stopped at a
+limit. The agreement above therefore holds at a 1e-4 gap. An exact rerun is
+still to be done.
 
 ### Against the authors' published code
 
@@ -355,6 +377,15 @@ waiting time.
    (`NetworkConfig.coherence_model`), but the Sobol ranking has not been
    recomputed under either.
 
+8. **Which conclusions are robust to candidate-site spacing?** Coverage is.
+   The network was re-solved at 80, 40 and 20 km site spacing, with a 900 s
+   limit per solve. At a budget of 200 repeaters, pairs served are the same
+   at every spacing: 12 at midrange, 18 at projected, and none with measured
+   hardware. Utility is not: it rises 12 per cent at midrange and 29 per cent
+   at projected from 80 to 20 km. So absolute utility is not quoted as though
+   80 km were an optimised choice. Three budgeted projected solves at 40 and
+   20 km did not prove optimality within the limit and are not counted.
+
 9. **Which hardware conclusions remain with defensible gate and readout
    values?** No Bell-state measurement fidelity for T centres has been
    published, so there is no defensible single value to substitute. The 0.946
@@ -396,8 +427,9 @@ and covered by a test.
 The largest change is that waiting-aware coherence is now part of the model.
 `NetworkConfig.coherence_model` offers the waiting gate and the two decay
 bounds (MODEL.md), built on `qrp.waiting`, and W5 and W6 plan through it
-instead of replacing `build_candidates` while they run. Rerun that way, W6
-reproduces every pair count, repeater count and fidelity it reported before.
+instead of replacing `build_candidates` while they run. Rerun that way, W5
+reproduces every row of its four result files exactly, and W6 reproduces
+every pair count, repeater count and fidelity it reported before.
 The only change is the median ratio of storage time to T2, now analytic
 rather than a Monte Carlo estimate, which moved by at most 0.02.
 

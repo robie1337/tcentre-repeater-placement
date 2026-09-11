@@ -1,0 +1,60 @@
+
+==============================================================================
+WEEK 1 ADDENDUM: the no-repeater threshold in the O band
+==============================================================================
+
+-- Check 1: the backbone length below which no repeater is placed [C band, paper baseline]
+   first repeater appears at 38.5 km
+   paper reports the transition at roughly 40 km
+   analytic crossover for this discretisation: 38.3 km
+   PASS  model matches its own analytic crossover
+   PASS  transition is in the paper's neighbourhood of 40 km
+
+-- Check 1: the backbone length below which no repeater is placed [O band, paper's other params]
+   first repeater appears at 22.0 km
+   analytic crossover for this discretisation: 21.9 km
+   PASS  model matches its own analytic crossover
+
+-- Check 1: the backbone length below which no repeater is placed [O band, T centre midrange]
+   first repeater appears at 12.5 km
+   analytic crossover for this discretisation: 12.1 km
+   PASS  model matches its own analytic crossover
+
+-- Check 1: the backbone length below which no repeater is placed [O band, T centre projected]
+   first repeater appears at 2.0 km
+   analytic crossover for this discretisation: 1.5 km
+   PASS  model matches its own analytic crossover
+
+-- Check 1: the backbone length below which no repeater is placed [O band, T centre measured]
+   no repeater is placed at any length in the scan
+   analytic crossover for this discretisation: inf km
+   NOTE  one swap already drops this path to the classical floor,
+         so no repeater is ever worth placing at any distance.
+   wrote results\w1b_oband_threshold.csv  (5 rows)
+
+                        case  alpha_db_per_km  link_fidelity  swap_success  solver_km  analytic_km  continuum_km
+      C band, paper baseline             0.20          0.950          0.50       38.5    38.343623     34.857839
+O band, paper's other params             0.35          0.950          0.50       22.0    21.910642     19.918765
+   O band, T centre midrange             0.35          0.960          0.70       12.5    12.081781     10.983437
+  O band, T centre projected             0.35          0.998          0.95        2.0     1.509790      1.372537
+   O band, T centre measured             0.35          0.600          0.50        NaN          inf           inf
+
+-- Check 2: the hop spacing the unconstrained model prefers
+case      C band, paper baseline  O band, T centre midrange  O band, T centre projected  O band, paper's other params
+reach_km                                                                                                             
+50.0                        25.0                       16.7                         5.6                          25.0
+100.0                       50.0                       25.0                         8.3                          33.3
+190.0                       63.3                       31.7                        11.2                          47.5
+200.0                       66.7                       33.3                        11.8                          50.0
+320.0                       80.0                       45.7                        14.5                          53.3
+500.0                      100.0                       55.6                        18.5                          71.4
+800.0                      114.3                       72.7                        23.5                          88.9
+1200.0                     150.0                       92.3                        28.6                         120.0
+1600.0                     177.8                      106.7                        33.3                         133.3
+
+   The graph is built on 80 km spacing. That is what the C band
+   optimum wants at about 320 km of reach. The O band optimum
+   wants roughly 55 to 60 per cent of it at every reach.
+   wrote results\w1b_preferred_spacing.csv  (36 rows)
+
+-- Check 3: does the 80 km candidate spacing change the answer
