@@ -14,11 +14,11 @@ combination carries a constant objective coefficient. We do the same. The
 solver therefore never sees a logarithm.
 
 Widths are sampled on a log-spaced grid rather than enumerated exhaustively.
-Utility grows as log2(W), so a log-spaced grid samples the objective
-uniformly. The paper enumerates every width up to min(D, W_E), which for
-D = 100 means a hundred variables per path where eight capture the same range
-to within a fraction of a bit. This is an approximation and is recorded as
-one; set ``width_grid=range(1, D+1)`` to reproduce the paper exactly.
+Under Eq. (2) utility grows as log2(W), which is why the grid is log-spaced,
+but memory is shared between pairs, so the grid is an approximation that can
+move the plan: on the CA9 presets it changes pairs served in 3 of 18 cases
+and utility by up to 3.5 bits (scripts/w8_truncation_checks.py). Set
+``width_grid=tuple(range(1, D+1))`` to reproduce the paper exactly.
 
 Decision variables
 ------------------

@@ -453,6 +453,26 @@ result would, have since been checked against the literature and in code.
   `w11_clock_schedule.py` reports the result under all three clocks and
   schedules.
 
+The review also asked whether the cut-downs made before solving move the
+answer. `w8_truncation_checks.py` re-solves the preset instances with each
+one loosened, on Gurobi, and every solve finished as optimal.
+
+- **The 300 km link cap does not.** Caps from 200 to 600 km give the same
+  pairs, repeaters, sites and utility in all 12 instances.
+- **The 20-hop cap binds once.** With projected hardware, an unlimited budget
+  and Eq. (2) rates, allowing 24 hops raises utility from 200.86 to 208.14
+  bits. It serves the same 18 pairs, on 52 repeaters instead of 47, and 24 and
+  30 hops agree. Caps of 12 and 16 hops lose a pair under the buffered model.
+- **The eight-width grid does.** Against every width from 1 to 100 it changes
+  pairs served in 3 of 18 instances. Midrange hardware under Eq. (2) serves 13
+  pairs, not 12, and projected hardware under the memoryless model serves 4,
+  not 3, at two budgets. Utility differs by up to 3.5 bits. The log grids are
+  not nested, and a 32-point grid still misses the extra midrange pair.
+
+Coverage at projected hardware stands on every setting. The midrange count
+of 12 pairs is one pair short because of the grid, and absolute utilities
+carry a few bits of grid and hop-cap error.
+
 ## What is not validated
 
 This is a planning model. It has not been validated against a discrete-event

@@ -23,10 +23,18 @@ of the last one arrives, and the T centre demonstration (Afzal et al.,
 arXiv:2406.01704) runs one herald per attempt, so the heralded clocks are the
 physical ones; source is shown to mark where the effect comes from.
 
-Run:  python scripts/w11_clock_schedule.py
+Two approximations checked in W8 can be loosened here: ``--width-grid all``
+offers every width from 1 to 100 instead of eight, and ``--max-hops`` raises
+the hop cap. Both make the models much larger, so pair them with
+``--backend gurobi``. Output files carry a suffix when either is not the
+default.
+
+Run:  python scripts/w11_clock_schedule.py [--backend gurobi] [--width-grid all] [--max-hops 24]
 """
 
 from __future__ import annotations
+
+import argparse
 
 import numpy as np
 import pandas as pd
@@ -49,24 +57,37 @@ def say(text: str = "") -> None:
     LINES.append(text)
 
 
-def plan(topo, paths, hardware, coherence_model="paper", clock="heralded"):
+def plan(topo, paths, hardware, width_grid, backend, coherence_model="paper", clock="heralded"):
     config = NetworkConfig(require_all_pairs=False, coherence_model=coherence_model,
-                           waiting_clock=clock)
+                           waiting_clock=clock, width_grid=width_grid)
     built = build_model(topo, paths, hardware, config)
     if built is None:
         return []
-    result = solve(built.problem, backend="highs", time_limit_s=TIME_LIMIT_S, mip_gap=1e-6)
+    result = solve(built.problem, backend=backend, time_limit_s=TIME_LIMIT_S, mip_gap=1e-6)
     if not result.optimal:
         raise RuntimeError(f"{coherence_model} {clock}: {result.status}")
     return [built.candidates[j] for j in range(built.n_candidates) if result.x[j] > 0.5]
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--backend", default="highs", choices=["highs", "gurobi", "cplex"])
+    parser.add_argument("--width-grid", default="log8", choices=["log8", "all"])
+    parser.add_argument("--max-hops", type=int, default=20)
+    args = parser.parse_args()
+    width_grid = None if args.width_grid == "log8" else tuple(range(1, 101))
+    suffix = ""
+    if args.width_grid != "log8":
+        suffix += f"_widths_{args.width_grid}"
+    if args.max_hops != 20:
+        suffix += f"_hops{args.max_hops}"
+
     say("=" * 78)
     say("W11: DOES THE ATTEMPT CLOCK OR THE SWAP SCHEDULE CHANGE THE RESULT?")
     say("=" * 78)
+    say(f"   backend {args.backend}, width grid {args.width_grid}, max hops {args.max_hops}")
     topo = build_ca9(spacing_km=80.0)
-    paths = enumerate_paths(topo, topo.demand_pairs(), max_link_km=300.0, max_hops=20)
+    paths = enumerate_paths(topo, topo.demand_pairs(), max_link_km=300.0, max_hops=args.max_hops)
     say(f"   candidate paths: {path_statistics(paths)}")
     config = NetworkConfig()
     longest = max(p.hops for pair_paths in paths.values() for p in pair_paths)
@@ -76,7 +97,7 @@ def main() -> None:
     rows = []
     for name, base in (("midrange", TCENTRE_MIDRANGE), ("projected", TCENTRE_PROJECTED)):
         hardware = base.with_(t_repeater_memory_s=T2_S, t_endnode_memory_s=T2_S)
-        published = plan(topo, paths, hardware)
+        published = plan(topo, paths, hardware, width_grid, args.backend)
         repeaters = {n for c in published for n in c.path.repeaters}
         mean_f = float(np.mean([c.fidelity for c in published]))
         say(f"\n-- {name}, T2 {1e3 * T2_S:.0f} ms: published plan {len(published)} pairs,"
@@ -97,21 +118,23 @@ def main() -> None:
                         broken += 1
                         f = 0.5
                     fidelities.append(f)
-                aware = plan(topo, paths, hardware, f"decay_{bound}", clock)
+                aware = plan(topo, paths, hardware, width_grid, args.backend, f"decay_{bound}", clock)
                 aware_reps = {n for c in aware for n in c.path.repeaters}
                 decayed_mean = float(np.mean(fidelities))
                 say(f"   {clock:<18} | {bound:<11} | {decayed_mean:>6.3f} {broken:>8} |"
                     f" {len(aware):>2} pairs, {len(aware_reps):>2} repeaters")
                 rows.append({"hardware": name, "t2_ms": 1e3 * T2_S, "clock": clock, "schedule": bound,
+                             "width_grid": args.width_grid, "max_hops": args.max_hops,
+                             "backend": args.backend,
                              "published_pairs": len(published), "published_mean_F": mean_f,
                              "published_mean_F_decayed": decayed_mean,
                              "published_pairs_broken": broken,
                              "aware_pairs": len(aware), "aware_repeaters": len(aware_reps)})
 
-    save_frame(pd.DataFrame(rows), "w11_clock_schedule.csv")
+    save_frame(pd.DataFrame(rows), f"w11_clock_schedule{suffix}.csv")
     say("\n" + "=" * 78)
-    (RESULTS / "w11_clock_schedule.log").write_text("\n".join(LINES) + "\n", encoding="utf-8")
-    print("   wrote results/w11_clock_schedule.log")
+    (RESULTS / f"w11_clock_schedule{suffix}.log").write_text("\n".join(LINES) + "\n", encoding="utf-8")
+    print(f"   wrote results/w11_clock_schedule{suffix}.log")
 
 
 if __name__ == "__main__":

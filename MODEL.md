@@ -77,10 +77,17 @@ not obviously the same quantity, and the difference decides whether the T
 centre can support long chains at all.
 
 **Widths are sampled, not enumerated.** The paper enumerates every path width
-up to `min(D, W_E)`. Utility grows as `log2(W)`, so this project uses an
-eight-point log-spaced grid, which samples the objective uniformly at an
-eighth of the variables. Pass `width_grid=tuple(range(1, 101))` to
-`NetworkConfig` to reproduce the paper exactly.
+up to `min(D, W_E)`. This project offers each path an eight-point log-spaced
+grid of widths, about a twelfth of the variables. Under Eq. (2) utility grows
+as `log2(W)`, which is why a log grid was chosen, but memory is shared, so
+the grid still matters. `w8_truncation_checks.py` compares it with every width
+from 1 to 100 on the preset instances. The grid changes pairs served in 3 of
+18 cases and utility by up to 3.5 bits: midrange hardware under Eq. (2)
+serves 13 pairs with every width and 12 on the grid, and the memoryless model
+serves one more pair at projected hardware. Pass
+`width_grid=tuple(range(1, 101))` to `NetworkConfig` to reproduce the paper
+exactly. With an academic Gurobi licence that model, about 42,000 variables,
+solves in about a minute.
 
 **The rate formula has a stated regime.** Eq. (2) is valid where
 `W * p_min >> 1`. Every sweep record carries that quantity so results outside

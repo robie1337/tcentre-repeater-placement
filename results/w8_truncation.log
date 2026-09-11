@@ -1,0 +1,58 @@
+==============================================================================
+W8: DO THE HOP LIMIT, THE LINK CAP AND THE WIDTH GRID CHANGE THE ANSWER?
+==============================================================================
+   paths at max_link 300 km, max_hops 12: 502 candidate paths over 18 pairs (8 to 50 per pair), hop counts 1 to 12 (8.0 s)
+   paths at max_link 300 km, max_hops 16: 538 candidate paths over 18 pairs (8 to 60 per pair), hop counts 1 to 16 (10.2 s)
+   paths at max_link 300 km, max_hops 20: 549 candidate paths over 18 pairs (8 to 71 per pair), hop counts 1 to 20 (10.8 s)
+   paths at max_link 300 km, max_hops 24: 549 candidate paths over 18 pairs (8 to 71 per pair), hop counts 1 to 24 (12.7 s)
+   paths at max_link 300 km, max_hops 30: 550 candidate paths over 18 pairs (8 to 72 per pair), hop counts 1 to 29 (11.5 s)
+   paths at max_link 200 km, max_hops 20: 367 candidate paths over 18 pairs (8 to 42 per pair), hop counts 1 to 20 (3.4 s)
+   paths at max_link 400 km, max_hops 20: 622 candidate paths over 18 pairs (8 to 78 per pair), hop counts 1 to 20 (15.6 s)
+   paths at max_link 500 km, max_hops 20: 653 candidate paths over 18 pairs (8 to 83 per pair), hop counts 1 to 20 (23.3 s)
+   paths at max_link 600 km, max_hops 20: 673 candidate paths over 18 pairs (8 to 88 per pair), hop counts 1 to 20 (25.4 s)
+
+   192 solves on gurobi, time limit 900 s each
+   done in 10.5 min; 0 solves not optimal
+
+-- max_hops (default 20)
+   reference: max_hops = 30
+    setting | solved | same pairs same repeaters same sites | max |dU| bits | median vars median solve s
+         12 | 12/12  |         11             11         11 |       39.5124 |        3324            2.0
+         16 | 12/12  |         11             11         11 |       15.7068 |        3402            2.3
+         20 | 12/12  |         12             11         11 |        7.2812 |        3438            2.0
+         24 | 12/12  |         12             11         11 |        0.0000 |        3430            1.9
+         30 | 12/12  |         12             12         12 |        0.0000 |        3434            2.8
+     changed: 12: projected budget unlimited paper pairs 18 vs 18, repeaters 47 vs 52, utility 168.629 vs 208.142
+     changed: 12: projected budget unlimited coordinated pairs 17 vs 18, repeaters 47 vs 47, utility 147.226 vs 183.084
+     changed: 16: projected budget unlimited paper pairs 18 vs 18, repeaters 47 vs 52, utility 192.435 vs 208.142
+     changed: 16: projected budget unlimited coordinated pairs 17 vs 18, repeaters 47 vs 47, utility 169.812 vs 183.084
+     changed: 20: projected budget unlimited paper pairs 18 vs 18, repeaters 47 vs 52, utility 200.860 vs 208.142
+     changed: 24: projected budget unlimited paper pairs 18 vs 18, repeaters 47 vs 52, utility 208.142 vs 208.142
+
+-- max_link_km (default 300.0)
+   reference: max_link_km = 600.0
+    setting | solved | same pairs same repeaters same sites | max |dU| bits | median vars median solve s
+      200.0 | 12/12  |         12             12         12 |        0.0000 |        2318            1.8
+      300.0 | 12/12  |         12             12         12 |        0.0000 |        3438            2.2
+      400.0 | 12/12  |         12             12         12 |        0.0000 |        3886            1.6
+      500.0 | 12/12  |         12             12         12 |        0.0000 |        4058            1.6
+      600.0 | 12/12  |         12             12         12 |        0.0000 |        4178            2.2
+     no setting changes pairs served or repeaters built
+
+-- width_grid (default log8)
+   reference: width_grid = all
+    setting | solved | same pairs same repeaters same sites | max |dU| bits | median vars median solve s
+       log8 | 18/18  |         15             16         16 |        3.5372 |        3438            3.4
+      log16 | 18/18  |         16             16         16 |        1.3494 |        5970            6.8
+      log32 | 18/18  |         15             16         16 |        0.4408 |       10612           17.6
+        all | 18/18  |         18             18         18 |        0.0000 |       42262           64.8
+     changed: log8: midrange budget unlimited paper pairs 12 vs 13, repeaters 54 vs 54, utility 70.806 vs 73.867
+     changed: log8: projected budget unlimited ext pairs 3 vs 4, repeaters 7 vs 11, utility 32.649 vs 32.741
+     changed: log8: projected budget 20 ext pairs 3 vs 4, repeaters 7 vs 11, utility 32.649 vs 32.741
+     changed: log16: projected budget unlimited ext pairs 3 vs 4, repeaters 7 vs 11, utility 32.649 vs 32.741
+     changed: log16: projected budget 20 ext pairs 3 vs 4, repeaters 7 vs 11, utility 32.649 vs 32.741
+     changed: log32: midrange budget unlimited paper pairs 12 vs 13, repeaters 54 vs 54, utility 73.434 vs 73.867
+     changed: log32: projected budget unlimited ext pairs 3 vs 4, repeaters 7 vs 11, utility 32.649 vs 32.741
+     changed: log32: projected budget 20 ext pairs 3 vs 4, repeaters 7 vs 11, utility 32.649 vs 32.741
+
+==============================================================================
