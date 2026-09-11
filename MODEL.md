@@ -95,16 +95,44 @@ the pair on a link that is ready early sits in memory until the slowest link
 on the path is ready. `NetworkConfig.coherence_model` chooses how that is
 treated. `paper` reproduces the source paper. `waiting_gate` also requires
 the expected storage time, the wait of the first ready pair for the last plus
-`tau_e2e`, to fit the shorter memory coherence time. `decay_optimistic` and
-`decay_pessimistic` keep the paper's gates and lower each path's fidelity by
-memory decay during the wait, under two bounds on the swap schedule: one pair
-waiting from the first link ready to the last, and every pair waiting for the
-last. Link times are independent exponentials on a heralded clock by default
-(`waiting_clock="source"` gives the paper's implicit clock), decay uses the
-idle echo T2, and the decay expectation is a seeded Monte Carlo estimate.
-`qrp.waiting` holds the formulas, and `tests/test_waiting.py` checks them
-against Monte Carlo, an exact integral and harmonic numbers. The swap schedule
-is bounded, not computed, so none of this is a protocol simulation.
+`tau_e2e`, to fit the shorter memory coherence time. The three `decay_`
+models keep the paper's gates and lower each path's fidelity by memory decay
+during the wait. `decay_swap_asap` uses the exact storage time of
+swap-as-soon-as-possible with deterministic swaps and no cut-off, which Kamin
+et al. (PRR 5, 023086, 2023) identify as the least-dephasing of the fast
+schemes. `decay_optimistic` (one pair waiting from the first link ready to
+the last) and `decay_pessimistic` (every pair waiting for the last) bound it
+from either side, and the tests check that it lies between them.
+
+Link times are independent exponentials, a continuous stand-in for the
+geometric number of attempt rounds. A single communication qubit cannot start
+a new attempt before it hears whether the last one succeeded, which is how the
+T centre's Barrett-Kok demonstration runs (Afzal et al., arXiv:2406.01704), so
+a round lasts at least as long as the herald takes to arrive. The default
+`waiting_clock="heralded"` takes the herald from the far node, `2 l / c`, as in
+Eq. (13); `heralded_midpoint` takes it from a detection station halfway along
+the link, `l / c`; `source` ignores the herald, which would need a spare
+memory for every attempt. Parallel attempts are the memory width `W`.
+
+Decay uses the memory's echo coherence time, so it assumes the memory is
+refocused while it waits: the T centre hydrogen spin has an echo T2 of 112 ms
+but a T2* of only 4 ms (Song et al. 2025). It also assumes the memory's own
+communication qubit is not driven during the wait. Driven, the hydrogen memory
+loses about 1e-4 of fidelity per optical cycle at 1 T with a 10 ns excited
+state (Brunelle et al., arXiv:2512.16047), which at herald-limited attempt
+rates on links of tens of kilometres is an effective coherence time of
+seconds, well above T2. The decay expectation is a seeded Monte Carlo
+estimate. `qrp.waiting` holds the formulas, and `tests/test_waiting.py` checks
+them against an event walk, Monte Carlo, an exact integral and harmonic
+numbers. Swaps that fail and restart are not in the decay calculation.
+`w12_swap_event_check.py` measures what that leaves out with an event
+simulation of swap-as-soon-as-possible on CA9 routes of 4 to 19 hops. The
+closed form agrees with the simulation to within 1.4 standard errors when
+swaps always succeed. Whole attempt rounds instead of exponential times change
+the decay factor by at most 0.5 per cent. Failed swaps lower it by at most 5
+per cent at a swap success of 0.95 and 18 per cent at 0.7, because surviving
+pairs keep waiting while destroyed segments regenerate. The model therefore
+slightly overstates the delivered fidelity when swaps can fail.
 
 **Candidate sites are evenly spaced, not real PoPs.** The operator does not publish
 PoP locations. Sites are placed at uniform 80 km spacing along each corridor.

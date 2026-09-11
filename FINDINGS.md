@@ -159,6 +159,26 @@ Replanning with decay serves 9 and 14 pairs at the optimistic bound, 4 and 6
 at the pessimistic one. Waits well inside T2 still cost fidelity, and on
 routes of 12 to 19 hops the cost compounds.
 
+The two bounds are far enough apart that the swap schedule has to be
+computed, not bounded, and the table above uses a herald returning from the
+far node, a round trip of `2 l / c`. A Barrett-Kok link heralded at a midpoint
+station waits only `l / c`. `w11_clock_schedule.py` repeats the comparison
+with the exact storage time of swap-as-soon-as-possible and all three clocks:
+
+| T2 = 112 ms, swap-as-soon-as-possible | Midrange: mean F, pairs at or below 1/2, decay-aware plan | Projected: same |
+|---|---|---|
+| Published plan, no decay | 0.785, 12 pairs served | 0.980, 18 pairs served |
+| Herald from the far node | 0.587, 5, 8 pairs | 0.585, 9, 11 pairs |
+| Herald from a midpoint station | 0.633, 3, 9 pairs | 0.642, 9, 13 pairs |
+| No wait for the herald | 0.735, 0, 12 pairs | 0.905, 1, 18 pairs |
+
+The midpoint row is the one to quote: the projected plan's mean fidelity falls
+from 0.98 to 0.64, 9 of its 18 pairs end at or below 1/2, and a decay-aware
+plan serves 13 pairs. The last row shows where the effect comes from. It is a
+property of attempts that wait for their herald, which a single communication
+qubit per attempt has to do and the T centre demonstration does. A node with a
+spare memory for every attempt would not see most of it.
+
 ## Limits
 
 Most numbers in this file were produced with the legacy candidate path
@@ -169,10 +189,21 @@ unchanged, and so is every W6 pair and repeater count (VALIDATION.md). The
 Sobol indices, the sweeps, and the W4 figures have not yet been rerun. The O band threshold table uses two-node test
 networks and does not depend on the path generator.
 
-The waiting-time results rest on three assumptions: a link cannot retry
-before its herald returns, the nuclear memory decays at its idle echo T2
-while the electron keeps attempting, and the swap schedule is bounded rather
-than computed. Each is a question about the hardware, not the model.
+The waiting-time results rest on assumptions about the hardware, now stated
+from the literature rather than left open.
+
+- **Attempts wait for the herald.** The effect depends on it, as the table
+  above shows. A single communication qubit has to wait, and the T centre
+  demonstration does (Afzal et al., arXiv:2406.01704).
+- **The memory is refocused while it stores.** Decay uses the hydrogen
+  nuclear echo T2 of 112 ms. Without refocusing the relevant time is T2* of
+  4 ms (Song et al. 2025), and the network would not work at all.
+- **The memory's own electron is idle while it waits.** Driving it costs about
+  1e-4 of memory fidelity per optical cycle at 1 T (Brunelle et al.,
+  arXiv:2512.16047), which is second order at herald-limited attempt rates.
+- **Swaps are deterministic.** The swap schedule is computed exactly for
+  swap-as-soon-as-possible under that assumption. Failed swaps make the
+  delivered fidelity slightly worse than the model reports (MODEL.md).
 
 The model has not been validated against a discrete-event simulator. No
 comparison was run against other qubit platforms, so nothing here says the

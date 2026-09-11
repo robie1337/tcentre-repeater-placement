@@ -73,6 +73,19 @@ def test_decay_only_lowers_fidelity_and_the_pessimistic_bound_lowers_it_more(pat
         assert 0.0 < cand.decay_factor <= opt[key].decay_factor <= 1.0
 
 
+def test_swap_asap_sits_between_the_decay_bounds(paths):
+    _, p = paths
+    opt = by_key(build_candidates(p, MEASURED_T2, config("decay_optimistic")))
+    asap = by_key(build_candidates(p, MEASURED_T2, config("decay_swap_asap")))
+    pess = by_key(build_candidates(p, MEASURED_T2, config("decay_pessimistic")))
+    assert asap
+    assert pess.keys() <= asap.keys() <= opt.keys()
+    for key, cand in asap.items():
+        assert cand.decay_factor <= opt[key].decay_factor + 1e-12
+        if key in pess:
+            assert pess[key].decay_factor <= cand.decay_factor + 1e-12
+
+
 def test_decay_weakens_as_coherence_grows(paths):
     _, p = paths
     shorter = MEASURED_T2.with_(t_repeater_memory_s=0.04, t_endnode_memory_s=0.04)

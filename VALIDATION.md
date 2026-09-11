@@ -212,9 +212,9 @@ assumes a nuclear memory, and the report has to say which memory it means.
 An anonymous review of the repository found that two parts of the code did
 not do what the documentation said. Both are fixed and tested. Rerunning the
 affected results began on 11 September 2026. So far the preset CA9 solves,
-W5 and W6 have been rerun. W4, the site-spacing check and the Sobol sweeps
-have not, and the answers below that would depend on them are left out until
-they are.
+the gate-noise and single-case checks, W5 and W6 have been rerun. W4, the
+site-spacing check and the Sobol sweeps have not, and the answers below that
+would depend on them are left out until they are.
 
 ### Solve outcomes
 
@@ -296,6 +296,12 @@ waiting-time result that depends on which tie the solver returns is an
 argument for putting waiting time inside the optimisation rather than
 scoring it afterwards.
 
+The gate-noise check gives the same numbers as before. The single-case run
+matches in eight of its nine cases. The exception is projected hardware with
+a budget of 25 repeaters, which now serves 15 pairs instead of 14 (utility
+156.38 against 149.09) with a different set of 25 sites. That is the larger
+candidate set finding a better plan, not a change in the model.
+
 W5, rerun with a 900 s limit and every solve optimal, gives the same shares
 of published plans with an unreachable pair as before, within one point in
 every cell: 80, 71 and 68 per cent under the strictest gate at unlimited,
@@ -339,12 +345,15 @@ waiting time.
    longer than T2, it makes 68 to 80 per cent of published plans contain an
    unreachable pair across the sampled hardware box, but at the measured
    nuclear T2 of 112 ms it removes no midrange pair and one projected pair.
-   As gradual decay at 112 ms it matters at every budget tested. At unlimited
-   budget the projected plan's mean fidelity falls from 0.980 to 0.631 even
-   under the optimistic swap bound, with 8 of 18 pairs at or below 1/2, and
-   a decay-aware plan serves 14 pairs (6 under the pessimistic bound). Both
-   models are applied in the W5 and W6 scripts, not yet as an option of the
-   model itself, and the Sobol ranking has not been recomputed under either.
+   As gradual decay at 112 ms it matters at every budget tested. With the
+   exact storage time of swap-as-soon-as-possible and a herald from a midpoint
+   station, the projected plan's mean fidelity at unlimited budget falls from
+   0.980 to 0.642, 9 of its 18 pairs end at or below 1/2, and a decay-aware
+   plan serves 13 pairs (`w11_clock_schedule.py`). The effect depends on
+   attempts waiting for their herald: without that wait the fidelity falls
+   only to 0.905. Both the gate and the decay are now options of the model
+   (`NetworkConfig.coherence_model`), but the Sobol ranking has not been
+   recomputed under either.
 
 9. **Which hardware conclusions remain with defensible gate and readout
    values?** No Bell-state measurement fidelity for T centres has been
@@ -355,6 +364,62 @@ waiting time.
    bracket coherence stayed first (total-effect index 0.82 to 0.91) and swap
    quality never exceeded 0.10. Those Sobol runs used the legacy path
    generator and have not been rerun.
+
+## Second code review, September 2026
+
+A second anonymous review, of commit `2012857`, accepted the path and
+status fixes above and raised what they left open. Each item below is fixed
+and covered by a test.
+
+- **Several paths per pair.** `NetworkConfig` allowed more than one path per
+  pair, and the model would then have counted each chosen path as a served
+  pair and added their utilities. Every committed result used one path per
+  pair, so none was affected. Any other value now raises.
+- **Impossible hardware.** `Hardware` accepted fidelities outside [0, 1],
+  negative attenuation and non-positive rates or coherence times. It now
+  rejects them.
+- **The SURFnet loader.** It matched end-node names by substring, took the
+  first match, and skipped a name it could not find. It now prefers an exact
+  label, accepts a single partial match, and raises on a missing or
+  ambiguous name. The coherence cliff check itself was not rerun, because
+  the authors' topology file is not in this repository.
+- **Provenance.** Sweep rows now record the coherence model, site spacing,
+  link cap, hop cap and width grid alongside the rate model, path strategy,
+  solver and gap.
+- **Ties.** Path costs within 12 significant figures are treated as equal,
+  and equal costs go to fewer hops, then to node order. That policy is now
+  tested in both directions.
+- **Wording.** The rate models are no longer called a floor and a ceiling,
+  and the three T centre presets are labelled as composites of separate
+  experiments rather than as single devices.
+
+The largest change is that waiting-aware coherence is now part of the model.
+`NetworkConfig.coherence_model` offers the waiting gate and the two decay
+bounds (MODEL.md), built on `qrp.waiting`, and W5 and W6 plan through it
+instead of replacing `build_candidates` while they run. Rerun that way, W6
+reproduces every pair count, repeater count and fidelity it reported before.
+The only change is the median ratio of storage time to T2, now analytic
+rather than a Monte Carlo estimate, which moved by at most 0.02.
+
+Two assumptions the review did not name, but a reader of the waiting-time
+result would, have since been checked against the literature and in code.
+
+- **The swap schedule.** The decay was bounded from two sides rather than
+  computed. `coherence_model="decay_swap_asap"` now uses the exact storage
+  time of swap-as-soon-as-possible with deterministic swaps, in closed form
+  for links of unequal length, which lies between the two bounds on every
+  sample tested. Kamin et al. (PRR 5, 023086, 2023) identify this schedule as
+  the least-dephasing of the fast schemes. `w12_swap_event_check.py` checks
+  it against an event simulation (MODEL.md gives the numbers). Failed swaps
+  lower the delivered fidelity a little further than the model does.
+- **The attempt clock.** A single communication qubit cannot start its next
+  attempt before the last one's herald arrives, and the T centre
+  demonstration (Afzal et al., arXiv:2406.01704) runs that way. The herald
+  comes from the far node in the model's default, a round trip of `2 l / c`,
+  but from a station at the link midpoint it takes `l / c`.
+  `waiting_clock="heralded_midpoint"` adds that geometry, and
+  `w11_clock_schedule.py` reports the result under all three clocks and
+  schedules.
 
 ## What is not validated
 

@@ -1,0 +1,34 @@
+
+==============================================================================
+WEEK 1: sensitivity to the gate and measurement fidelity assumption
+==============================================================================
+Legacy gate and readout pair used in the comparison:
+   two-qubit gate fidelity  P_2  = 0.986   (Afzal 2024, T centre)
+   measurement fidelity     eta  = 0.946   (erbium ion, Raha et al. 2020; NOT a T centre value)
+   per-swap Werner factor        = 0.8478  (1.0 when both are perfect)
+
+-- Effect on the hop budget
+   midrange F_L = 0.96       20 hops ->   5 hops
+   projected F_L = 0.998    200 hops ->   7 hops
+   wrote results\w1_gate_noise_hops.csv  (2 rows)
+
+-- Effect on the network result
+   midrange   perfect gates (used in this project)   served 12/18   utility    70.81
+   midrange   legacy pair (misattributed readout)    served  5/18   utility    34.34
+   projected  perfect gates (used in this project)   served 18/18   utility   200.86
+   projected  legacy pair (misattributed readout)    served 11/18   utility    90.04
+   wrote results\w1_gate_noise_effect.csv  (4 rows)
+
+-- What this means
+   The noisy pair changes the result by more than any of the four
+   swept parameters, but its readout figure is from the wrong
+   platform. The five-parameter sweep with swap quality in
+   [0.71, 0.997] is the defensible version of this check.
+
+   An open question remains: Eq. (5) wants the fidelity of the
+   Bell-state measurement that performs the swap, which is not
+   obviously the same number as any single-shot readout fidelity.
+
+==============================================================================
+GATE NOISE CHECK COMPLETE
+==============================================================================

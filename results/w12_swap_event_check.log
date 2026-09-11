@@ -1,0 +1,16 @@
+==============================================================================
+W12: CLOSED-FORM SWAP-ASAP DECAY AGAINST AN EVENT SIMULATION
+==============================================================================
+   projected hardware, T2 112 ms, width 100, heralded clock; Werner factor of the delivered pair, mean +- standard error
+   hops worst km | closed form |   q=1 exponential |     q=1 geometric |            q=0.95 |             q=0.7
+      4       75 |      0.8694 |  0.8674 +- 0.0014 |  0.8714 +- 0.0013 |  0.8673 +- 0.0019 |  0.8496 +- 0.0039
+      8       72 |      0.8319 |  0.8325 +- 0.0013 |  0.8344 +- 0.0013 |  0.8276 +- 0.0018 |  0.7953 +- 0.0035
+     12       75 |      0.6613 |  0.6615 +- 0.0017 |  0.6602 +- 0.0017 |  0.6486 +- 0.0025 |  0.5756 +- 0.0047
+     16       76 |      0.6183 |  0.6177 +- 0.0017 |  0.6199 +- 0.0017 |  0.6021 +- 0.0024 |  0.5289 +- 0.0045
+     19       76 |      0.5244 |  0.5251 +- 0.0017 |  0.5272 +- 0.0017 |  0.4983 +- 0.0023 |  0.4277 +- 0.0042
+
+   closed form against the deterministic simulation: at most 1.4 standard errors apart
+   geometric rounds change the factor by at most 0.5 per cent
+   failed swaps lower it by at most 5.0 per cent at q = 0.95 and 18.4 per cent at q = 0.7
+
+==============================================================================

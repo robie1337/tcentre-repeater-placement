@@ -1,0 +1,38 @@
+
+==============================================================================
+WEEK 1 SINGLE CASE: T centre hardware on CA9
+==============================================================================
+Nine-city carrier network: 9 end nodes, 53 candidate sites, 64 segments, 2 component(s), 4810 km of fibre, segment length 63.3 to 80.0 km
+552 candidate paths over 18 pairs (8 to 70 per pair), hop counts 1 to 20
+   wrote figures/fig_topology.pdf
+
+-- measured: alpha_db_per_km=0.35, link_fidelity=0.6, swap_success=0.5, generation_rate_hz=1, t_endnode_memory_s=0.112
+   budget  10: utility -0.000 | 0 repeaters | 0/18 pairs served           [77 vars]
+   budget  25: utility -0.000 | 0 repeaters | 0/18 pairs served           [77 vars]
+   budget  53: utility -0.000 | 0 repeaters | 0/18 pairs served           [77 vars]
+
+-- midrange: alpha_db_per_km=0.35, link_fidelity=0.96, swap_success=0.7, generation_rate_hz=20000, t_endnode_memory_s=0.01
+   budget  10: utility 34.677 | 10 repeaters | 5/18 pairs served          [2421 vars]
+   budget  25: utility 57.792 | 25 repeaters | 9/18 pairs served          [2421 vars]
+   budget  53: utility 69.943 | 53 repeaters | 11/18 pairs served         [2421 vars]
+
+-- projected: alpha_db_per_km=0.35, link_fidelity=0.998, swap_success=0.95, generation_rate_hz=200000, t_endnode_memory_s=0.1
+   budget  10: utility 60.943 | 10 repeaters | 5/18 pairs served          [4478 vars]
+   budget  25: utility 156.384 | 25 repeaters | 15/18 pairs served        [4478 vars]
+   budget  53: utility 200.860 | 47 repeaters | 18/18 pairs served        [4478 vars]
+   wrote results\w1_single_case.csv  (9 rows)
+   wrote figures/fig_placement_projected_b25.pdf
+
+-- Paths chosen at the projected setting, budget 25
+   Kamloops-Kelowna         h=3   w=27   F=0.9940  R=2.96e+04 Hz  U=13.84
+   Kamloops-Vancouver       h=5   w=27   F=0.9901  R=1.33e+04 Hz  U=12.67
+   Kelowna-Vancouver        h=8   w=27   F=0.9841  R=1.14e+04 Hz  U=12.43
+   Calgary-Edmonton         h=4   w=27   F=0.9920  R=1.1e+04 Hz  U=12.40
+   Calgary-Saskatoon        h=8   w=27   F=0.9841  R=5.98e+03 Hz  U=11.50
+   Edmonton-Saskatoon       h=12  w=27   F=0.9763  R=4.87e+03 Hz  U=11.18
+   Calgary-Kamloops         h=8   w=14   F=0.9841  R=4.64e+03 Hz  U=11.13
+   Edmonton-Kamloops        h=12  w=14   F=0.9763  R=3.78e+03 Hz  U=10.81
+
+==============================================================================
+SINGLE CASE COMPLETE
+==============================================================================

@@ -65,6 +65,10 @@ REACHES_KM = (50.0, 100.0, 190.0, 200.0, 320.0, 500.0, 800.0, 1200.0, 1600.0)
 
 SPACINGS_KM = (80.0, 40.0, 20.0)
 BUDGETS = (25, 53, 200)
+#: Per-solve limit for the spacing check. At 40 and 20 km the default candidate
+#: set makes the budgeted models large; without a limit one solve ran for over
+#: an hour. An unfinished solve is reported as such, never as a result.
+SPACING_TIME_LIMIT_S = 900.0
 
 
 # --------------------------------------------------------------------------
@@ -191,7 +195,8 @@ def spacing_sensitivity() -> pd.DataFrame:
                     require_all_pairs=False,
                     use_demand_weights=False,
                 )
-                result = solve_placement(topo, paths, hardware, config)
+                result = solve_placement(topo, paths, hardware, config,
+                                         time_limit_s=SPACING_TIME_LIMIT_S)
                 rows.append(
                     {
                         "spacing_km": spacing,
@@ -203,8 +208,13 @@ def spacing_sensitivity() -> pd.DataFrame:
                         "n_repeaters": result.n_repeaters,
                         "utility": round(result.utility, 3),
                         "status": result.status,
+                        "mip_gap": result.mip_gap,
+                        "n_model_vars": result.n_model_vars,
                     }
                 )
+                print(f"   {spacing:>4.0f} km  {label:<9} budget {budget:>3}: {result.status},"
+                      f" {result.served_pairs} pairs, {result.n_repeaters} repeaters,"
+                      f" {result.n_model_vars} variables", flush=True)
 
     frame = pd.DataFrame(rows)
     for field in ("served_pairs", "n_repeaters", "utility"):
@@ -213,16 +223,29 @@ def spacing_sensitivity() -> pd.DataFrame:
             index=["hardware", "budget"], columns="spacing_km", values=field,
         ).to_string())
 
+    unfinished = frame[frame["status"] != "optimal"]
+    if len(unfinished):
+        print(f"\n   {len(unfinished)} solves did not finish as optimal within"
+              f" {SPACING_TIME_LIMIT_S:.0f} s, so their rows are not results:")
+        print(unfinished[["spacing_km", "hardware", "budget", "status", "mip_gap"]].to_string(index=False))
+
+    # Computed from this run rather than written in, so the text cannot go
+    # stale when the path generator or the solver changes.
+    solved = frame[frame["status"] == "optimal"]
+    top = max(BUDGETS)
     print()
-    print("   Pairs served is unchanged at unlimited budget, so the coverage")
-    print("   and feasibility results are spacing-robust. Utility is not:")
-    print("   refining 80 to 20 km raises it by roughly 12 per cent at the")
-    print("   midrange setting and 29 per cent at the projected one. Absolute")
-    print("   utility magnitudes should not be quoted as if 80 km were an")
-    print("   optimised choice; it is an inherited C band assumption.")
+    for label, g in solved[solved["budget"] == top].groupby("hardware", sort=False):
+        served = dict(zip(g["spacing_km"], g["served_pairs"]))
+        utility = dict(zip(g["spacing_km"], g["utility"]))
+        line = f"   {label:<9} budget {top}: pairs served " + ", ".join(
+            f"{int(served[s])} at {s:.0f} km" for s in SPACINGS_KM if s in served)
+        if 80.0 in utility and 20.0 in utility and utility[80.0] > 0:
+            line += f"; utility {100 * (utility[20.0] / utility[80.0] - 1):+.0f}% from 80 to 20 km"
+        print(line)
     print()
-    print("   Caveat: site sets at different spacings are not nested, so this")
-    print("   is not a clean relaxation. At budget 25 the coarse grid wins.")
+    print("   Absolute utility should not be quoted as if 80 km were an optimised")
+    print("   choice; it is an inherited C band assumption. Site sets at different")
+    print("   spacings are not nested, so this is not a clean relaxation.")
     return frame
 
 

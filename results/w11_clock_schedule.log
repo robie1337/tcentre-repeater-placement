@@ -1,0 +1,30 @@
+==============================================================================
+W11: DOES THE ATTEMPT CLOCK OR THE SWAP SCHEDULE CHANGE THE RESULT?
+==============================================================================
+   candidate paths: 549 candidate paths over 18 pairs (8 to 71 per pair), hop counts 1 to 20
+
+-- midrange, T2 112 ms: published plan 12 pairs, 54 repeaters, mean F 0.785
+   clock              | schedule    | mean F F <= 1/2 | decay-aware plan
+   heralded           | optimistic  |  0.618        3 |  9 pairs, 39 repeaters
+   heralded           | swap_asap   |  0.587        5 |  8 pairs, 33 repeaters
+   heralded           | pessimistic |  0.548        8 |  4 pairs, 11 repeaters
+   heralded_midpoint  | optimistic  |  0.669        1 | 11 pairs, 53 repeaters
+   heralded_midpoint  | swap_asap   |  0.633        3 |  9 pairs, 39 repeaters
+   heralded_midpoint  | pessimistic |  0.592        5 |  6 pairs, 20 repeaters
+   source             | optimistic  |  0.748        0 | 12 pairs, 54 repeaters
+   source             | swap_asap   |  0.735        0 | 12 pairs, 54 repeaters
+   source             | pessimistic |  0.705        1 | 11 pairs, 53 repeaters
+
+-- projected, T2 112 ms: published plan 18 pairs, 47 repeaters, mean F 0.980
+   clock              | schedule    | mean F F <= 1/2 | decay-aware plan
+   heralded           | optimistic  |  0.631        8 | 14 pairs, 47 repeaters
+   heralded           | swap_asap   |  0.585        9 | 11 pairs, 46 repeaters
+   heralded           | pessimistic |  0.544       14 |  6 pairs, 20 repeaters
+   heralded_midpoint  | optimistic  |  0.728        1 | 17 pairs, 47 repeaters
+   heralded_midpoint  | swap_asap   |  0.642        9 | 13 pairs, 40 repeaters
+   heralded_midpoint  | pessimistic |  0.580       10 |  9 pairs, 36 repeaters
+   source             | optimistic  |  0.911        0 | 18 pairs, 47 repeaters
+   source             | swap_asap   |  0.905        1 | 18 pairs, 47 repeaters
+   source             | pessimistic |  0.888        1 | 17 pairs, 47 repeaters
+
+==============================================================================

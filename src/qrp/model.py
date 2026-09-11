@@ -70,7 +70,8 @@ from .topology import Topology
 RATE_MODELS = ("paper", "coordinated", "ext")
 
 #: Coherence treatments ``NetworkConfig.coherence_model`` accepts.
-COHERENCE_MODELS = ("paper", "waiting_gate", "decay_optimistic", "decay_pessimistic")
+COHERENCE_MODELS = ("paper", "waiting_gate", "decay_optimistic", "decay_swap_asap",
+                    "decay_pessimistic")
 
 
 def log_width_grid(max_width: int, n_points: int = 8) -> tuple[int, ...]:
@@ -112,14 +113,16 @@ class NetworkConfig:
     #: which bound propagation delay only, and reproduces the source paper.
     #: "waiting_gate" also requires the expected storage time (the wait of the
     #: first-ready pair for the last link, plus tau_e2e) to fit the shorter
-    #: memory coherence time. "decay_optimistic" and "decay_pessimistic" keep
-    #: the paper's gates and lower each path's fidelity by memory decay during
-    #: that wait, under the two swap-schedule bounds described in
-    #: physics.storage_decay_factor. None of these is a protocol simulation.
+    #: memory coherence time. The three "decay_" models keep the paper's gates
+    #: and lower each path's fidelity by memory decay during that wait:
+    #: "decay_swap_asap" uses the exact storage of swap-as-soon-as-possible with
+    #: deterministic swaps, and "decay_optimistic" and "decay_pessimistic"
+    #: bound it from either side (qrp.waiting.storage_decay_factor).
     coherence_model: str = "paper"
-    #: Attempt-round clock for the waiting models: "heralded" means a link
-    #: cannot retry before its herald returns; "source" means one round per
-    #: source attempt. See physics.link_ready_rates.
+    #: Attempt-round clock for the waiting models: "heralded" waits for a
+    #: herald from the far node (2 l / c), "heralded_midpoint" for one from a
+    #: detection station halfway along the link (l / c), and "source" runs one
+    #: round per source attempt. See qrp.waiting.link_ready_rates.
     waiting_clock: str = "heralded"
     #: Monte Carlo samples and seed for the decay expectation.
     decay_samples: int = 4000

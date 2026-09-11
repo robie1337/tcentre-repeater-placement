@@ -109,3 +109,48 @@ def test_unknown_options_raise():
         waiting.storage_decay_factor(RATES, 0.0, 0.1, samples, "median")
     with pytest.raises(ValueError):
         waiting.storage_decay_factor(RATES, 0.0, 0.1, samples[:, :2], "optimistic")
+
+
+def _event_swap_asap_qubit_time(times):
+    """Walk the chain node by node: each interior node swaps once both its links exist."""
+    t_max = max(times)
+    total = 0.0
+    for node in range(1, len(times)):
+        swap = max(times[node - 1], times[node])
+        total += (swap - times[node - 1]) + (swap - times[node])
+    return total + (t_max - times[0]) + (t_max - times[-1])
+
+
+def test_swap_asap_matches_an_event_walk():
+    samples = waiting.unit_exponential_samples(3000, 20, seed=5)
+    t2, tau = 0.05, 1e-3
+    times = samples[:, : len(RATES)] / RATES
+    expected = np.mean([math.exp(-_event_swap_asap_qubit_time(row) / t2) for row in times])
+    expected *= math.exp(-tau / t2)
+    assert waiting.storage_decay_factor(RATES, tau, t2, samples, "swap_asap") == pytest.approx(expected, rel=1e-10)
+
+
+def test_swap_asap_lies_between_the_bounds():
+    samples = waiting.unit_exponential_samples(4000, 20, seed=3)
+    rates = np.array([30.0, 55.0, 12.0, 80.0, 20.0, 45.0, 9.0])
+    for t2 in (0.01, 0.112, 1.0):
+        opt, asap, pess = (waiting.storage_decay_factor(rates, 1e-3, t2, samples, bound)
+                           for bound in ("optimistic", "swap_asap", "pessimistic"))
+        assert pess <= asap + 1e-15
+        assert asap <= opt + 1e-15
+
+
+def test_swap_asap_equals_both_bounds_for_two_links():
+    samples = waiting.unit_exponential_samples(4000, 20, seed=3)
+    values = [waiting.storage_decay_factor(RATES[:2], 1e-3, 0.05, samples, bound)
+              for bound in waiting.DECAY_BOUNDS]
+    assert values == pytest.approx([values[0]] * 3)
+
+
+def test_midpoint_herald_halves_the_round_on_long_links():
+    length = 240.0
+    probs = [physics.link_success(length, 0.35)]
+    # At 20 kHz one attempt is 50 microseconds, shorter than either herald delay.
+    midpoint = waiting.link_ready_rates([length], probs, 10, 20e3, "heralded_midpoint")
+    far = waiting.link_ready_rates([length], probs, 10, 20e3, "heralded")
+    assert midpoint[0] == pytest.approx(2.0 * far[0])
