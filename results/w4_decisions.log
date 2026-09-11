@@ -1,221 +1,223 @@
 ==============================================================================
 W4: DOES CORRECTING THE RATE EQUATION CHANGE THE PLACEMENT DECISION?
 ==============================================================================
+   candidate paths (candidates): 549 candidate paths over 18 pairs (8 to 71 per pair), hop counts 1 to 20
 
 -- 1. Objective 'published': 302 hardware points x 7 budgets x 3 rate models, memory ceiling 100
-   6342 solves in 5.7 min
+   6342 solves in 21.2 min
 
    Presets (r = repeaters built, p = pairs served):
-   midrange  budget unlimited | paper 54r 12p | coord 53r 11p | ext  7r  3p | vs coord: changed   served_and_memory   0.070 bits/pair | vs ext: changed   served_and_memory  65.780 bits/pair |
-   midrange  budget        40 | paper 40r 12p | coord 40r 10p | ext  7r  3p | vs coord: changed   routing            0.108 bits/pair | vs ext: changed   served_and_memory  76.616 bits/pair |
-   midrange  budget        30 | paper 28r  9p | coord 28r  9p | ext  7r  3p | vs coord: identical                    0.000 bits/pair | vs ext: changed   served_and_memory  39.748 bits/pair |
-   midrange  budget        20 | paper 18r  7p | coord 18r  7p | ext  7r  3p | vs coord: tie                          0.000 bits/pair | vs ext: changed   served_and_memory  22.358 bits/pair |
-   midrange  budget        15 | paper 15r  5p | coord 15r  5p | ext  7r  3p | vs coord: tie                         -0.000 bits/pair | vs ext: changed   served_and_memory   6.389 bits/pair |
-   midrange  budget        10 | paper 10r  5p | coord 10r  5p | ext  7r  3p | vs coord: identical                    0.000 bits/pair | vs ext: changed   routing           13.107 bits/pair |
-   midrange  budget         6 | paper  6r  3p | coord  6r  3p | ext  4r  2p | vs coord: identical                    0.000 bits/pair | vs ext: changed   routing            1.468 bits/pair |
-   projected budget unlimited | paper 47r 18p | coord 47r 18p | ext  7r  3p | vs coord: tie                          0.000 bits/pair | vs ext: changed   served_and_memory 192.740 bits/pair |
-   projected budget        40 | paper 40r 18p | coord 40r 17p | ext  7r  3p | vs coord: changed   served_and_memory   0.078 bits/pair | vs ext: changed   served_and_memory 225.236 bits/pair |
-   projected budget        30 | paper 29r 16p | coord 30r 15p | ext  7r  3p | vs coord: changed   served_and_memory   0.087 bits/pair | vs ext: changed   served_and_memory 201.394 bits/pair |
-   projected budget        20 | paper 20r 11p | coord 20r 11p | ext  7r  3p | vs coord: tie                          0.000 bits/pair | vs ext: changed   served_and_memory  92.794 bits/pair |
+   midrange  budget unlimited | paper 54r 12p | coord 53r 11p | ext  7r  3p | vs coord: changed   served_and_memory   0.070 bits/pair | vs ext: changed   served_and_memory  67.039 bits/pair |
+   midrange  budget        40 | paper 40r 12p | coord 40r 10p | ext  7r  3p | vs coord: changed   routing            0.108 bits/pair | vs ext: changed   served_and_memory  77.558 bits/pair |
+   midrange  budget        30 | paper 28r  9p | coord 28r  9p | ext  7r  3p | vs coord: identical                    0.000 bits/pair | vs ext: changed   served_and_memory  37.975 bits/pair |
+   midrange  budget        20 | paper 18r  7p | coord 18r  7p | ext  7r  3p | vs coord: tie                          0.000 bits/pair | vs ext: changed   served_and_memory  21.815 bits/pair |
+   midrange  budget        15 | paper 15r  5p | coord 15r  5p | ext  7r  3p | vs coord: tie                          0.000 bits/pair | vs ext: changed   served_and_memory   6.423 bits/pair |
+   midrange  budget        10 | paper 10r  5p | coord 10r  5p | ext  7r  3p | vs coord: tie                          0.000 bits/pair | vs ext: changed   routing           13.107 bits/pair |
+   midrange  budget         6 | paper  6r  3p | coord  6r  3p | ext  4r  2p | vs coord: tie                         -0.000 bits/pair | vs ext: changed   routing            1.468 bits/pair |
+   projected budget unlimited | paper 47r 18p | coord 47r 18p | ext  7r  3p | vs coord: changed   routing            0.028 bits/pair | vs ext: changed   served_and_memory 191.876 bits/pair |
+   projected budget        40 | paper 40r 18p | coord 40r 18p | ext  7r  3p | vs coord: changed   routing            0.028 bits/pair | vs ext: changed   served_and_memory 200.436 bits/pair |
+   projected budget        30 | paper 30r 18p | coord 30r 18p | ext  7r  3p | vs coord: changed   routing            0.040 bits/pair | vs ext: changed   served_and_memory 236.847 bits/pair |
+   projected budget        20 | paper 20r 11p | coord 20r 11p | ext  7r  3p | vs coord: tie                          0.000 bits/pair | vs ext: changed   served_and_memory  95.560 bits/pair |
    projected budget        15 | paper 15r  7p | coord 15r  7p | ext  7r  3p | vs coord: identical                    0.000 bits/pair | vs ext: changed   routing           35.316 bits/pair |
-   projected budget        10 | paper 10r  5p | coord 10r  5p | ext  7r  3p | vs coord: identical                    0.000 bits/pair | vs ext: changed   routing            8.453 bits/pair |
-   projected budget         6 | paper  6r  3p | coord  6r  3p | ext  6r  3p | vs coord: identical                    0.000 bits/pair | vs ext: identical                    0.000 bits/pair |
+   projected budget        10 | paper 10r  5p | coord 10r  5p | ext  7r  3p | vs coord: tie                          0.000 bits/pair | vs ext: changed   routing            8.453 bits/pair |
+   projected budget         6 | paper  6r  4p | coord  6r  3p | ext  6r  3p | vs coord: changed   routing            0.061 bits/pair | vs ext: changed   routing           14.136 bits/pair |
 
    published: paper's plan against the buffered model (valid at low W*p)
       budget |    n | ident |  tie |     changed | routing  served-set  memory  both | regret bits/pair: median   p90    max
-   unlimited |  302 |   105 |  107 |   90 ( 30%) |       4           1       0    85 |                  0.178  0.416  0.741
-          40 |  302 |   117 |   79 |  106 ( 35%) |      29           4       0    73 |                  0.143  0.400  0.741
-          30 |  302 |   104 |   79 |  119 ( 39%) |      43           3       0    73 |                  0.112  0.282  0.741
-          20 |  302 |   115 |  121 |   66 ( 22%) |      18           0       0    48 |                  0.146  0.364  0.741
-          15 |  302 |   140 |  142 |   20 (  7%) |      15           0       0     5 |                  0.118  0.258  0.741
-          10 |  302 |   201 |   64 |   37 ( 12%) |      18           2       0    17 |                  0.187  0.504  0.600
-           6 |  302 |   294 |    0 |    8 (  3%) |       8           0       0     0 |                  0.078  0.090  0.092
+   unlimited |  302 |   115 |   96 |   91 ( 30%) |       5           6       0    80 |                  0.175  0.415  0.741
+          40 |  302 |   109 |   85 |  108 ( 36%) |      37           5       0    66 |                  0.140  0.399  0.741
+          30 |  302 |   100 |   73 |  129 ( 43%) |      56           0       0    73 |                  0.112  0.272  0.741
+          20 |  302 |   116 |  120 |   66 ( 22%) |      18           0       0    48 |                  0.146  0.364  0.741
+          15 |  302 |   147 |  134 |   21 (  7%) |      16           0       0     5 |                  0.102  0.257  0.741
+          10 |  302 |   190 |   75 |   37 ( 12%) |      18           1       0    18 |                  0.187  0.504  0.600
+           6 |  302 |   211 |   81 |   10 (  3%) |      10           0       0     0 |                  0.078  0.103  0.198
      Direction, all changed instances:
-     over 446 instances (coordinated minus paper):
-       repeaters built                mean   -4.39 | fewer  326 | same   74 | more   46
-       pairs served                   mean   -1.62 | fewer  441 | same    5 | more    0
-       mean hops, pairs both serve    mean   -0.06 | fewer   98 | same  314 | more   34
-       mean width, pairs both serve   mean   +7.69 | fewer   13 | same  113 | more  320
-       site-set overlap (Jaccard)     median 0.65 | min 0.33
-       pairs routed differently       median 0 | max 3
-       corrected rate gained on shared pairs, bits  median 0.232 | max 3.241
+     over 462 instances (coordinated minus paper):
+       repeaters built                mean   -4.24 | fewer  328 | same   91 | more   43
+       pairs served                   mean   -1.60 | fewer  442 | same   20 | more    0
+       mean hops, pairs both serve    mean   -0.06 | fewer  110 | same  305 | more   47
+       mean width, pairs both serve   mean   +7.56 | fewer   16 | same  122 | more  324
+       site-set overlap (Jaccard)     median 0.64 | min 0.33
+       pairs routed differently       median 0 | max 4
+       corrected rate gained on shared pairs, bits  median 0.237 | max 3.241
      Direction, routing changes only:
-     over 135 instances (coordinated minus paper):
-       repeaters built                mean   -0.40 | fewer   60 | same   30 | more   45
-       pairs served                   mean   -1.34 | fewer  130 | same    5 | more    0
-       mean hops, pairs both serve    mean   -0.19 | fewer   98 | same    3 | more   34
-       mean width, pairs both serve   mean   +6.26 | fewer    3 | same   54 | more   78
-       site-set overlap (Jaccard)     median 0.60 | min 0.36
-       pairs routed differently       median 1 | max 3
-       corrected rate gained on shared pairs, bits  median 0.289 | max 3.241
+     over 160 instances (coordinated minus paper):
+       repeaters built                mean   -0.35 | fewer   64 | same   53 | more   43
+       pairs served                   mean   -1.32 | fewer  140 | same   20 | more    0
+       mean hops, pairs both serve    mean   -0.16 | fewer  110 | same    3 | more   47
+       mean width, pairs both serve   mean   +5.75 | fewer   11 | same   60 | more   89
+       site-set overlap (Jaccard)     median 0.61 | min 0.33
+       pairs routed differently       median 1 | max 4
+       corrected rate gained on shared pairs, bits  median 0.284 | max 3.241
      Where in the sweep box the plan changes (share of Latin hypercube points):
-     T2 < 5 ms: 1% of 735 | 5-20 ms: 30% of 630 | > 20 ms: 34% of 735
-     rate < 10 kHz: 30% of 910 | 10-50 kHz: 17% of 644 | > 50 kHz: 12% of 546
-     F_L < 0.95: 20% of 812 | 0.95-0.975: 19% of 672 | > 0.975: 25% of 616
-     q_s < 0.65: 25% of 700 | 0.65-0.8: 22% of 700 | > 0.8: 16% of 700
+     T2 < 5 ms: 1% of 735 | 5-20 ms: 30% of 630 | > 20 ms: 36% of 735
+     rate < 10 kHz: 30% of 910 | 10-50 kHz: 17% of 644 | > 50 kHz: 13% of 546
+     F_L < 0.95: 20% of 812 | 0.95-0.975: 20% of 672 | > 0.975: 26% of 616
+     q_s < 0.65: 25% of 700 | 0.65-0.8: 21% of 700 | > 0.8: 18% of 700
 
    published: paper's plan against the memoryless model (Q-CAST EXT)
       budget |    n | ident |  tie |     changed | routing  served-set  memory  both | regret bits/pair: median   p90    max
-   unlimited |  302 |    83 |    0 |  219 ( 73%) |       0           2       0   217 |                 57.832 162.419 279.557
-          40 |  302 |    83 |    0 |  219 ( 73%) |       0           2       0   217 |                 49.509 177.711 299.717
-          30 |  302 |    83 |    0 |  219 ( 73%) |       0           2       0   217 |                 37.125 143.201 256.439
-          20 |  302 |    83 |    0 |  219 ( 73%) |       0           2       0   217 |                 22.539 104.035 175.291
-          15 |  302 |    83 |    0 |  219 ( 73%) |       3           2       0   214 |                 13.195 20.658 38.423
-          10 |  302 |   104 |    0 |  198 ( 66%) |     123          57       0    18 |                 10.642 13.272 16.472
-           6 |  302 |   150 |    1 |  151 ( 50%) |     151           0       0     0 |                  1.494  2.468  2.688
+   unlimited |  302 |    83 |    0 |  219 ( 73%) |       0           2       0   217 |                 57.487 162.321 278.193
+          40 |  302 |    83 |    0 |  219 ( 73%) |       0           2       0   217 |                 49.509 179.285 301.013
+          30 |  302 |    83 |    0 |  219 ( 73%) |       0           2       0   217 |                 37.469 166.061 253.196
+          20 |  302 |    83 |    0 |  219 ( 73%) |       0           2       0   217 |                 22.865 103.595 171.142
+          15 |  302 |    83 |    0 |  219 ( 73%) |       3           2       0   214 |                 12.785 19.981 38.423
+          10 |  302 |   104 |    0 |  198 ( 66%) |     123          57       0    18 |                 10.377 13.305 16.272
+           6 |  302 |   146 |    3 |  153 ( 51%) |     153           0       0     0 |                  1.495  2.476 14.605
      Direction, all changed instances:
-     over 1444 instances (ext minus paper):
-       repeaters built                mean  -17.00 | fewer 1444 | same    0 | more    0
-       pairs served                   mean   -4.78 | fewer 1444 | same    0 | more    0
-       mean hops, pairs both serve    mean   +0.11 | fewer    0 | same 1167 | more  277
-       mean width, pairs both serve   mean  +43.24 | fewer    0 | same  218 | more 1226
+     over 1446 instances (ext minus paper):
+       repeaters built                mean  -16.98 | fewer 1444 | same    2 | more    0
+       pairs served                   mean   -4.81 | fewer 1446 | same    0 | more    0
+       mean hops, pairs both serve    mean   +0.11 | fewer    2 | same 1167 | more  277
+       mean width, pairs both serve   mean  +43.42 | fewer    0 | same  218 | more 1228
        site-set overlap (Jaccard)     median 0.27 | min 0.07
        pairs routed differently       median 0 | max 1
-       corrected rate gained on shared pairs, bits  median 3.591 | max 10.128
+       corrected rate gained on shared pairs, bits  median 3.591 | max 9.263
      Direction, routing changes only:
-     over 277 instances (ext minus paper):
-       repeaters built                mean   -2.51 | fewer  277 | same    0 | more    0
-       pairs served                   mean   -1.45 | fewer  277 | same    0 | more    0
-       mean hops, pairs both serve    mean   +0.57 | fewer    0 | same    0 | more  277
-       mean width, pairs both serve   mean   +9.70 | fewer    0 | same  151 | more  126
+     over 279 instances (ext minus paper):
+       repeaters built                mean   -2.49 | fewer  277 | same    2 | more    0
+       pairs served                   mean   -1.45 | fewer  279 | same    0 | more    0
+       mean hops, pairs both serve    mean   +0.56 | fewer    2 | same    0 | more  277
+       mean width, pairs both serve   mean   +9.98 | fewer    0 | same  151 | more  128
        site-set overlap (Jaccard)     median 0.43 | min 0.16
        pairs routed differently       median 1 | max 1
-       corrected rate gained on shared pairs, bits  median 2.859 | max 5.757
+       corrected rate gained on shared pairs, bits  median 2.862 | max 5.757
      Where in the sweep box the plan changes (share of Latin hypercube points):
      T2 < 5 ms: 20% of 735 | 5-20 ms: 94% of 630 | > 20 ms: 95% of 735
      rate < 10 kHz: 70% of 910 | 10-50 kHz: 70% of 644 | > 50 kHz: 62% of 546
      F_L < 0.95: 66% of 812 | 0.95-0.975: 66% of 672 | > 0.975: 73% of 616
-     q_s < 0.65: 65% of 700 | 0.65-0.8: 70% of 700 | > 0.8: 69% of 700
+     q_s < 0.65: 65% of 700 | 0.65-0.8: 70% of 700 | > 0.8: 70% of 700
 
--- 2. Objective 'serve_first': 302 hardware points x 7 budgets x 3 rate models, memory ceiling 100
-   6342 solves in 450.7 min
-   5 paper solves did not return optimal
-   5 coordinated solves did not return optimal
-   8 ext solves did not return optimal
+-- 2. Objective 'serve_first': 22 hardware points x 7 budgets x 3 rate models, memory ceiling 100
+   462 solves in 106.8 min
+   2 paper solves did not return optimal
+   4 coordinated solves did not return optimal
+   4 ext solves did not return optimal
 
    Presets (r = repeaters built, p = pairs served):
    midrange  budget unlimited | paper 55r 14p | coord 55r 14p | ext 55r 14p | vs coord: identical                    0.000 bits/pair | vs ext: changed   memory_only        0.068 bits/pair |
-   midrange  budget        40 | paper 40r 14p | coord 40r 14p | ext 40r 14p | vs coord: tie                          0.000 bits/pair | vs ext: changed   memory_only        0.185 bits/pair |
-   midrange  budget        30 | paper 30r 14p | coord 30r 14p | ext 30r 14p | vs coord: identical                    0.000 bits/pair | vs ext: changed   routing            2.521 bits/pair |
-   midrange  budget        20 | paper 20r 14p | coord 20r 14p | ext 20r 14p | vs coord: identical                    0.000 bits/pair | vs ext: changed   routing            1.773 bits/pair |
-   midrange  budget        15 | paper 15r 13p | coord 15r 13p | ext 15r 13p | vs coord: tie                          0.000 bits/pair | vs ext: changed   routing            1.607 bits/pair |
-   midrange  budget        10 | paper 10r 11p | coord 10r 11p | ext 10r 11p | vs coord: identical                    0.000 bits/pair | vs ext: changed   routing            4.741 bits/pair |
-   midrange  budget         6 | paper  6r  9p | coord  6r  9p | ext  6r  9p | vs coord: tie                         -0.000 bits/pair | vs ext: changed   memory_only        0.211 bits/pair |
-   projected budget unlimited | paper 47r 18p | coord 47r 18p | ext 55r 18p | vs coord: tie                          0.000 bits/pair | vs ext: changed   routing            1.822 bits/pair |
-   projected budget        40 | paper 40r 18p | coord 40r 18p | ext 40r 18p | vs coord: tie                          0.000 bits/pair | vs ext: changed   routing            3.473 bits/pair |
-   projected budget        30 | paper 30r 18p | coord 30r 18p | ext 30r 18p | vs coord: tie                         -0.000 bits/pair | vs ext: changed   routing            4.685 bits/pair |
-   projected budget        20 | paper 20r 18p | coord 20r 18p | ext 20r 18p | vs coord: changed   routing            0.033 bits/pair | vs ext: changed   routing            2.909 bits/pair |
-   projected budget        15 | paper 15r 16p | coord 15r 16p | ext 15r 16p | vs coord: tie                         -0.000 bits/pair | vs ext: changed   routing            5.095 bits/pair |
-   projected budget        10 | paper 10r 13p | coord 10r 13p | ext 10r 13p | vs coord: tie                          0.000 bits/pair | vs ext: changed   memory_only        0.371 bits/pair |
-   projected budget         6 | paper  6r  9p | coord  6r  9p | ext  6r  9p | vs coord: tie                          0.000 bits/pair | vs ext: changed   memory_only        0.210 bits/pair |
+   midrange  budget        40 | paper 40r 14p | coord 40r 14p | ext 40r 14p | vs coord: tie                         -0.000 bits/pair | vs ext: changed   memory_only        0.185 bits/pair |
+   midrange  budget        30 | paper 29r 14p | coord 30r 14p | ext 30r 14p | vs coord: changed   routing            0.008 bits/pair | vs ext: changed   routing            1.994 bits/pair |
+   midrange  budget        20 | paper 20r 14p | coord 20r 14p | ext 20r 14p | vs coord: changed   routing            0.015 bits/pair | vs ext: changed   routing            1.731 bits/pair |
+   midrange  budget        15 | paper 15r 14p | coord 15r 14p | ext 15r 14p | vs coord: identical                    0.000 bits/pair | vs ext: changed   routing            1.708 bits/pair |
+   midrange  budget        10 | paper 10r 12p | coord 10r 12p | ext 10r 12p | vs coord: tie                         -0.000 bits/pair | vs ext: changed   routing            3.455 bits/pair |
+   midrange  budget         6 | paper  6r  9p | coord  6r  9p | ext  6r  9p | vs coord: identical                    0.000 bits/pair | vs ext: changed   routing            0.321 bits/pair |
+   projected budget unlimited | paper 47r 18p | coord 47r 18p | ext 55r 18p | vs coord: changed   routing            0.028 bits/pair | vs ext: changed   routing            2.026 bits/pair |
+   projected budget        40 | paper 40r 18p | coord 40r 18p | ext 40r 18p | vs coord: changed   routing            0.028 bits/pair | vs ext: changed   routing            1.335 bits/pair |
+   projected budget        30 | paper 30r 18p | coord 30r 18p | ext 30r 18p | vs coord: changed   routing            0.051 bits/pair | vs ext: changed   routing            1.083 bits/pair |
+   projected budget        20 | paper 20r 18p | coord 20r 18p | ext  0r  0p | vs coord: changed   routing            0.027 bits/pair | vs ext: solver_problem nan                  nan bits/pair |
+   projected budget        15 | paper 15r 18p | coord 15r 18p | ext  0r  0p | vs coord: changed   routing            0.003 bits/pair | vs ext: solver_problem nan                  nan bits/pair |
+   projected budget        10 | paper 10r 16p | coord 10r 16p | ext 10r 16p | vs coord: tie                         -0.000 bits/pair | vs ext: changed   routing            1.601 bits/pair |
+   projected budget         6 | paper  6r 11p | coord  6r 11p | ext  6r 11p | vs coord: tie                          0.000 bits/pair | vs ext: changed   memory_only        0.342 bits/pair |
 
    serve_first: paper's plan against the buffered model (valid at low W*p)
-   (10 instances dropped for a solver status other than optimal)
+   (6 instances dropped for a solver status other than optimal)
       budget |    n | ident |  tie |     changed | routing  served-set  memory  both | regret bits/pair: median   p90    max
-   unlimited |  302 |   136 |  110 |   56 ( 19%) |      56           0       0     0 |                  0.009  0.019  0.042
-          40 |  302 |   134 |  139 |   29 ( 10%) |      29           0       0     0 |                  0.011  0.019  0.037
-          30 |  302 |   130 |  160 |   12 (  4%) |      12           0       0     0 |                  0.010  0.033  0.105
-          20 |  298 |   118 |  104 |   76 ( 26%) |      76           0       0     0 |                  0.033  0.075  0.077
-          15 |  299 |   105 |  166 |   28 (  9%) |      28           0       0     0 |                  0.046  0.084  0.089
-          10 |  300 |   116 |  170 |   14 (  5%) |      14           0       0     0 |                  0.059  0.071  0.073
-           6 |  301 |   120 |  176 |    5 (  2%) |       5           0       0     0 |                  0.084  0.084  0.084
+   unlimited |   22 |    11 |    5 |    6 ( 27%) |       6           0       0     0 |                  0.015  0.027  0.028
+          40 |   22 |     8 |   11 |    3 ( 14%) |       3           0       0     0 |                  0.028  0.051  0.057
+          30 |   22 |     9 |    7 |    6 ( 27%) |       6           0       0     0 |                  0.025  0.050  0.051
+          20 |   22 |     8 |    5 |    9 ( 41%) |       9           0       0     0 |                  0.015  0.030  0.038
+          15 |   19 |     9 |    4 |    6 ( 32%) |       6           0       0     0 |                  0.033  0.054  0.066
+          10 |   21 |     5 |   13 |    3 ( 14%) |       3           0       0     0 |                  0.043  0.054  0.056
+           6 |   20 |     6 |   12 |    2 ( 10%) |       1           0       0     1 |                  0.069  0.081  0.084
      Direction, all changed instances:
-     over 220 instances (coordinated minus paper):
-       repeaters built                mean   -0.01 | fewer   11 | same  202 | more    7
-       pairs served                   mean   +0.00 | fewer    0 | same  220 | more    0
-       mean hops, pairs both serve    mean   -0.10 | fewer   88 | same  110 | more   22
-       mean width, pairs both serve   mean   +0.02 | fewer    4 | same  199 | more   17
-       site-set overlap (Jaccard)     median 0.90 | min 0.36
-       pairs routed differently       median 1 | max 9
-       corrected rate gained on shared pairs, bits  median 0.033 | max 0.120
+     over 35 instances (coordinated minus paper):
+       repeaters built                mean   +0.17 | fewer    0 | same   32 | more    3
+       pairs served                   mean   +0.00 | fewer    0 | same   35 | more    0
+       mean hops, pairs both serve    mean   +0.05 | fewer    3 | same   12 | more   20
+       mean width, pairs both serve   mean   +0.28 | fewer    0 | same   33 | more    2
+       site-set overlap (Jaccard)     median 0.90 | min 0.15
+       pairs routed differently       median 3 | max 11
+       corrected rate gained on shared pairs, bits  median 0.029 | max 0.236
      Direction, routing changes only:
-     over 220 instances (coordinated minus paper):
-       repeaters built                mean   -0.01 | fewer   11 | same  202 | more    7
-       pairs served                   mean   +0.00 | fewer    0 | same  220 | more    0
-       mean hops, pairs both serve    mean   -0.10 | fewer   88 | same  110 | more   22
-       mean width, pairs both serve   mean   +0.02 | fewer    4 | same  199 | more   17
-       site-set overlap (Jaccard)     median 0.90 | min 0.36
-       pairs routed differently       median 1 | max 9
-       corrected rate gained on shared pairs, bits  median 0.033 | max 0.120
+     over 34 instances (coordinated minus paper):
+       repeaters built                mean   +0.18 | fewer    0 | same   31 | more    3
+       pairs served                   mean   +0.00 | fewer    0 | same   34 | more    0
+       mean hops, pairs both serve    mean   +0.05 | fewer    3 | same   11 | more   20
+       mean width, pairs both serve   mean   +0.01 | fewer    0 | same   33 | more    1
+       site-set overlap (Jaccard)     median 0.90 | min 0.15
+       pairs routed differently       median 3 | max 11
+       corrected rate gained on shared pairs, bits  median 0.029 | max 0.112
      Where in the sweep box the plan changes (share of Latin hypercube points):
-     T2 < 5 ms: 0% of 735 | 5-20 ms: 14% of 628 | > 20 ms: 18% of 727
-     rate < 10 kHz: 11% of 908 | 10-50 kHz: 11% of 641 | > 50 kHz: 10% of 541
-     F_L < 0.95: 10% of 810 | 0.95-0.975: 11% of 668 | > 0.975: 10% of 612
-     q_s < 0.65: 14% of 698 | 0.65-0.8: 8% of 697 | > 0.8: 9% of 695
+     T2 < 5 ms: 2% of 56 | 5-20 ms: 32% of 41 | > 20 ms: 38% of 37
+     rate < 10 kHz: 31% of 45 | 10-50 kHz: 13% of 55 | > 50 kHz: 21% of 34
+     F_L < 0.95: 21% of 90 | 0.95-0.975: 0% of 21 | > 0.975: 39% of 23
+     q_s < 0.65: 14% of 49 | 0.65-0.8: 14% of 35 | > 0.8: 32% of 50
 
    serve_first: paper's plan against the memoryless model (Q-CAST EXT)
-   (13 instances dropped for a solver status other than optimal)
+   (6 instances dropped for a solver status other than optimal)
       budget |    n | ident |  tie |     changed | routing  served-set  memory  both | regret bits/pair: median   p90    max
-   unlimited |  302 |    94 |    0 |  208 ( 69%) |     131           0      77     0 |                  1.680  3.000  5.400
-          40 |  300 |    92 |    0 |  208 ( 69%) |     162           0      46     0 |                  3.192  5.888  7.681
-          30 |  298 |    89 |    1 |  208 ( 70%) |     179           0      29     0 |                  3.057  5.614  6.250
-          20 |  298 |    88 |    0 |  210 ( 70%) |     189           0      21     0 |                  3.162  3.576  4.465
-          15 |  300 |    86 |    0 |  214 ( 71%) |     202           0      12     0 |                  3.339  6.138  6.652
-          10 |  302 |    88 |    0 |  214 ( 71%) |      76           0     138     0 |                  0.298  2.649  8.229
-           6 |  301 |    94 |    0 |  207 ( 69%) |      56           0     151     0 |                  0.315  1.304  1.586
+   unlimited |   22 |     8 |    0 |   14 ( 64%) |       9           0       5     0 |                  1.951  3.242  3.354
+          40 |   22 |     7 |    0 |   15 ( 68%) |      10           0       5     0 |                  2.067  3.915  6.062
+          30 |   22 |     7 |    0 |   15 ( 68%) |      13           0       2     0 |                  1.994  4.783  8.079
+          20 |   21 |     7 |    0 |   14 ( 67%) |      13           0       1     0 |                  3.397  8.112  8.666
+          15 |   19 |     7 |    0 |   12 ( 63%) |      12           0       0     0 |                  1.627  4.361  4.545
+          10 |   22 |     5 |    0 |   17 ( 77%) |      13           0       0     4 |                  1.601  3.239  3.455
+           6 |   20 |     4 |    1 |   15 ( 75%) |      12           0       3     0 |                  0.342  5.302 10.113
      Direction, all changed instances:
-     over 1469 instances (ext minus paper):
-       repeaters built                mean   +0.08 | fewer    8 | same 1392 | more   69
-       pairs served                   mean   +0.00 | fewer    0 | same 1469 | more    0
-       mean hops, pairs both serve    mean   -0.21 | fewer  612 | same  598 | more  259
-       mean width, pairs both serve   mean   +0.06 | fewer  291 | same  591 | more  587
-       site-set overlap (Jaccard)     median 0.70 | min 0.15
-       pairs routed differently       median 3 | max 15
-       corrected rate gained on shared pairs, bits  median 0.916 | max 7.903
+     over 102 instances (ext minus paper):
+       repeaters built                mean   +0.23 | fewer    0 | same   90 | more   12
+       pairs served                   mean   +0.00 | fewer    0 | same  102 | more    0
+       mean hops, pairs both serve    mean   -0.26 | fewer   45 | same   41 | more   16
+       mean width, pairs both serve   mean   -0.15 | fewer   33 | same   35 | more   34
+       site-set overlap (Jaccard)     median 0.67 | min 0.00
+       pairs routed differently       median 5 | max 16
+       corrected rate gained on shared pairs, bits  median 1.102 | max 8.254
      Direction, routing changes only:
-     over 995 instances (ext minus paper):
-       repeaters built                mean   +0.12 | fewer    8 | same  918 | more   69
-       pairs served                   mean   +0.00 | fewer    0 | same  995 | more    0
-       mean hops, pairs both serve    mean   -0.31 | fewer  612 | same  124 | more  259
-       mean width, pairs both serve   mean   +0.07 | fewer  266 | same  289 | more  440
-       site-set overlap (Jaccard)     median 0.58 | min 0.15
-       pairs routed differently       median 5 | max 15
-       corrected rate gained on shared pairs, bits  median 2.275 | max 7.903
+     over 82 instances (ext minus paper):
+       repeaters built                mean   +0.28 | fewer    0 | same   70 | more   12
+       pairs served                   mean   +0.00 | fewer    0 | same   82 | more    0
+       mean hops, pairs both serve    mean   -0.32 | fewer   45 | same   21 | more   16
+       mean width, pairs both serve   mean   -0.16 | fewer   29 | same   20 | more   33
+       site-set overlap (Jaccard)     median 0.53 | min 0.00
+       pairs routed differently       median 6 | max 16
+       corrected rate gained on shared pairs, bits  median 1.673 | max 8.254
      Where in the sweep box the plan changes (share of Latin hypercube points):
-     T2 < 5 ms: 18% of 735 | 5-20 ms: 97% of 628 | > 20 ms: 99% of 724
-     rate < 10 kHz: 74% of 906 | 10-50 kHz: 68% of 639 | > 50 kHz: 65% of 542
-     F_L < 0.95: 66% of 807 | 0.95-0.975: 68% of 668 | > 0.975: 76% of 612
-     q_s < 0.65: 67% of 697 | 0.65-0.8: 71% of 696 | > 0.8: 72% of 694
+     T2 < 5 ms: 20% of 56 | 5-20 ms: 98% of 42 | > 20 ms: 100% of 38
+     rate < 10 kHz: 79% of 47 | 10-50 kHz: 47% of 55 | > 50 kHz: 79% of 34
+     F_L < 0.95: 70% of 90 | 0.95-0.975: 10% of 21 | > 0.975: 100% of 25
+     q_s < 0.65: 61% of 49 | 0.65-0.8: 60% of 35 | > 0.8: 75% of 52
 
 -- 3. Memory ceiling 2048, objective 'serve_first', paper vs buffered, 42 points
-   252 solves in 1.6 min
+   252 solves in 41.0 min
 
    Presets (r = repeaters built, p = pairs served):
    midrange  budget unlimited | paper 55r 14p | coord 55r 14p | vs coord: identical                    0.000 bits/pair |
-   midrange  budget        20 | paper 20r 14p | coord 20r 14p | vs coord: tie                          0.000 bits/pair |
-   midrange  budget        10 | paper 10r 11p | coord 10r 11p | vs coord: identical                    0.000 bits/pair |
-   projected budget unlimited | paper 47r 18p | coord 47r 18p | vs coord: changed   routing            0.005 bits/pair |
-   projected budget        20 | paper 20r 18p | coord 20r 18p | vs coord: identical                    0.000 bits/pair |
-   projected budget        10 | paper 10r 13p | coord 10r 13p | vs coord: identical                    0.000 bits/pair |
+   midrange  budget        20 | paper 20r 14p | coord 20r 14p | vs coord: changed   routing            0.016 bits/pair |
+   midrange  budget        10 | paper 10r 12p | coord 10r 12p | vs coord: identical                    0.000 bits/pair |
+   projected budget unlimited | paper 47r 18p | coord 47r 18p | vs coord: changed   routing            0.033 bits/pair |
+   projected budget        20 | paper 20r 18p | coord 20r 18p | vs coord: changed   routing            0.027 bits/pair |
+   projected budget        10 | paper 10r 16p | coord 10r 16p | vs coord: tie                          0.000 bits/pair |
 
    memory 2048: paper's plan against the buffered model (valid at low W*p)
+   (1 instances dropped for a solver status other than optimal)
       budget |    n | ident |  tie |     changed | routing  served-set  memory  both | regret bits/pair: median   p90    max
-   unlimited |   42 |    34 |    2 |    6 ( 14%) |       6           0       0     0 |                  0.008  0.017  0.019
-          20 |   42 |    31 |    4 |    7 ( 17%) |       7           0       0     0 |                  0.033  0.034  0.037
-          10 |   42 |    28 |   13 |    1 (  2%) |       1           0       0     0 |                  0.056  0.056  0.056
+   unlimited |   42 |    27 |    6 |    9 ( 21%) |       9           0       0     0 |                  0.015  0.027  0.033
+          20 |   42 |    18 |    7 |   17 ( 40%) |      17           0       0     0 |                  0.012  0.027  0.063
+          10 |   41 |    17 |   19 |    5 ( 12%) |       5           0       0     0 |                  0.059  0.096  0.117
      Direction, all changed instances:
-     over 14 instances (coordinated minus paper):
-       repeaters built                mean   +0.36 | fewer    0 | same   12 | more    2
-       pairs served                   mean   +0.00 | fewer    0 | same   14 | more    0
-       mean hops, pairs both serve    mean   -0.00 | fewer    4 | same    7 | more    3
-       mean width, pairs both serve   mean   +0.00 | fewer    0 | same   14 | more    0
-       site-set overlap (Jaccard)     median 0.90 | min 0.73
-       pairs routed differently       median 1 | max 3
-       corrected rate gained on shared pairs, bits  median 0.033 | max 0.115
+     over 31 instances (coordinated minus paper):
+       repeaters built                mean   +0.16 | fewer    1 | same   27 | more    3
+       pairs served                   mean   +0.00 | fewer    0 | same   31 | more    0
+       mean hops, pairs both serve    mean   +0.03 | fewer    5 | same   15 | more   11
+       mean width, pairs both serve   mean   +0.00 | fewer    0 | same   31 | more    0
+       site-set overlap (Jaccard)     median 0.90 | min 0.43
+       pairs routed differently       median 3 | max 8
+       corrected rate gained on shared pairs, bits  median 0.015 | max 0.115
      Direction, routing changes only:
-     over 14 instances (coordinated minus paper):
-       repeaters built                mean   +0.36 | fewer    0 | same   12 | more    2
-       pairs served                   mean   +0.00 | fewer    0 | same   14 | more    0
-       mean hops, pairs both serve    mean   -0.00 | fewer    4 | same    7 | more    3
-       mean width, pairs both serve   mean   +0.00 | fewer    0 | same   14 | more    0
-       site-set overlap (Jaccard)     median 0.90 | min 0.73
-       pairs routed differently       median 1 | max 3
-       corrected rate gained on shared pairs, bits  median 0.033 | max 0.115
+     over 31 instances (coordinated minus paper):
+       repeaters built                mean   +0.16 | fewer    1 | same   27 | more    3
+       pairs served                   mean   +0.00 | fewer    0 | same   31 | more    0
+       mean hops, pairs both serve    mean   +0.03 | fewer    5 | same   15 | more   11
+       mean width, pairs both serve   mean   +0.00 | fewer    0 | same   31 | more    0
+       site-set overlap (Jaccard)     median 0.90 | min 0.43
+       pairs routed differently       median 3 | max 8
+       corrected rate gained on shared pairs, bits  median 0.015 | max 0.115
      Where in the sweep box the plan changes (share of Latin hypercube points):
-     T2 < 5 ms: 2% of 54 | 5-20 ms: 10% of 30 | > 20 ms: 25% of 36
-     rate < 10 kHz: 14% of 57 | 10-50 kHz: 3% of 33 | > 50 kHz: 13% of 30
-     F_L < 0.95: 11% of 57 | 0.95-0.975: 4% of 27 | > 0.975: 17% of 36
-     q_s < 0.65: 11% of 36 | 0.65-0.8: 8% of 39 | > 0.8: 13% of 45
+     T2 < 5 ms: 2% of 54 | 5-20 ms: 37% of 30 | > 20 ms: 46% of 35
+     rate < 10 kHz: 30% of 56 | 10-50 kHz: 15% of 33 | > 50 kHz: 20% of 30
+     F_L < 0.95: 26% of 57 | 0.95-0.975: 11% of 27 | > 0.975: 29% of 35
+     q_s < 0.65: 28% of 36 | 0.65-0.8: 21% of 39 | > 0.8: 23% of 44
 
 ==============================================================================
 W4 COMPLETE

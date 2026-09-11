@@ -233,10 +233,11 @@ assumes a nuclear memory, and the report has to say which memory it means.
 
 An anonymous review of the repository found that two parts of the code did
 not do what the documentation said. Both are fixed and tested. Rerunning the
-affected results began on 11 September 2026. So far the preset CA9 solves,
-the gate-noise and single-case checks, W5 and W6 have been rerun. W4, the
-site-spacing check and the Sobol sweeps have not, and the answers below that
-would depend on them are left out until they are.
+affected results began on 11 September 2026. The preset CA9 solves, the
+gate-noise and single-case checks, the site-spacing check, W5, W6 and W4 have
+been rerun, W4's serve-first section on a sample of 22 hardware points. The
+Sobol sweeps have not, and the answer below that depends on the full set of
+changes is left out until the remaining checks finish.
 
 ### Solve outcomes
 
@@ -376,6 +377,18 @@ waiting time.
    only to 0.905. Both the gate and the decay are now options of the model
    (`NetworkConfig.coherence_model`), but the Sobol ranking has not been
    recomputed under either.
+
+7. **Do the headline conclusions survive across rate models?** For the
+   placement decision, yes. Rerun on the default candidate set, W4 finds that
+   choosing the plan under Eq. (2) and scoring it under the buffered model
+   costs at most 0.084 bits per pair (about 6 per cent) when pairs are served
+   first. That covers the two presets and 20 Latin hypercube points at seven
+   budgets. Across all 302 points under the paper's own objective, the shares
+   of changed plans match the legacy run. The memoryless model is the
+   exception: it cannot hold pairs across rounds and collapses coverage. For
+   the sensitivity ranking the answer is unchanged but not rerun: coherence
+   stayed first under all three rate models on the legacy candidate set, and
+   those Sobol sweeps have not been repeated on the default set.
 
 8. **Which conclusions are robust to candidate-site spacing?** Coverage is.
    The network was re-solved at 80, 40 and 20 km site spacing, with a 900 s

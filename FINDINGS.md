@@ -122,13 +122,15 @@ never exceeds 0.10.
 
 A biased rate only matters to a planner if it changes what gets built.
 `w4_rate_model_decisions.py` solves each instance under Eq. (2) and under
-the buffered rate model, then scores each plan under the other model. Across
-302 hardware points and seven repeater budgets, with pairs served first so
-the served set does not depend on the time unit, the buffered model changes
-the routing in 2 to 26 per cent of instances, and the plan chosen under
-Eq. (2) loses at most 0.105 bits of log2 utility per pair, about 7.5 per
-cent. The rate equation is outside its regime, but correcting it barely moves
-the plan.
+the buffered rate model, then scores each plan under the other model. With
+pairs served first, so that the served set does not depend on the time unit,
+the default candidate set was solved for the two presets and 20 Latin
+hypercube points at seven repeater budgets. The buffered model changes the
+routing in 10 to 41 per cent of instances, and the plan chosen under Eq. (2)
+loses at most 0.084 bits of log2 utility per pair, about 6 per cent. With up
+to 2048 memories the loss is at most 0.117 bits per pair. The rate equation is
+outside its regime, but correcting it barely moves the plan. On the legacy
+candidate set and all 302 points the loss was at most 0.105 bits per pair.
 
 The coherence constraint is a different matter. Eqs. (13) and (14) bound
 propagation delay. Neither counts the time a memory holds one link's pair
@@ -183,10 +185,11 @@ spare memory for every attempt would not see most of it.
 
 Most numbers in this file were produced with the legacy candidate path
 generator, which discarded tied routes, lost some hop counts, and pruned
-routes the network optimum can need (MODEL.md). W5 and the W6 table above
-have been rerun on the default generator: the W5 shares quoted above are
-unchanged, and so is every W6 pair and repeater count (VALIDATION.md). The
-Sobol indices, the sweeps, and the W4 figures have not yet been rerun. The O band threshold table uses two-node test
+routes the network optimum can need (MODEL.md). W4, W5 and the W6 table
+above have been rerun on the default generator: the W4 and W5 figures quoted
+above come from those reruns, and every W6 pair and repeater count is
+unchanged (VALIDATION.md). The Sobol indices and the grid and Latin hypercube
+sweeps have not yet been rerun. The O band threshold table uses two-node test
 networks and does not depend on the path generator.
 
 The waiting-time results rest on assumptions about the hardware, now stated
