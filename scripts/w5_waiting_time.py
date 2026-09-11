@@ -60,7 +60,7 @@ import qrp.model as model_module
 from qrp import physics
 from qrp.hardware import TCENTRE_MIDRANGE, TCENTRE_PROJECTED, hardware_from_sweep
 from qrp.model import NetworkConfig, log_width_grid
-from qrp.paths import enumerate_paths
+from qrp.paths import enumerate_paths, path_statistics
 from qrp.solver import solve
 from qrp.sweep import latin_hypercube_points
 from qrp.topology import build_ca9
@@ -164,7 +164,7 @@ def solve_plan(topo, paths, hardware, rate_model, budget, memories, width_grid, 
     if serve_bonus:
         built.problem.c[: built.n_candidates] += serve_bonus
     result = solve(built.problem, backend="highs", time_limit_s=time_limit_s, mip_gap=mip_gap)
-    if not result.feasible:
+    if not result.optimal:
         return {"status": result.status, "chosen": frozenset(), "cands": cands}
     chosen = frozenset(
         (built.candidates[j].pair, built.candidates[j].path.nodes, built.candidates[j].width)
@@ -311,8 +311,9 @@ def budget_label(b: int) -> str:
 
 def presets_table(frame, variants) -> None:
     for _, r in frame[frame["source"] != "lhs"].iterrows():
+        unfinished = "" if r["statuses_ok"] else "  [a solve stopped at its limit: counts below are not results]"
         say(f"   {r['source']:<9} budget {budget_label(r['budget']):>9} | published plan"
-            f" {int(r['base_paper_served']):>2} pairs {int(r['base_paper_repeaters']):>2} repeaters")
+            f" {int(r['base_paper_served']):>2} pairs {int(r['base_paper_repeaters']):>2} repeaters{unfinished}")
         for v in variants:
             say(f"     {v:<18} unreachable in published plan {int(r[f'unreachable_{v}']):>2}"
                 f" (median wait/T2 {r[f'median_wait_over_t2_{v}']:.2f}) | waiting-aware plan,"
@@ -339,7 +340,8 @@ def summary(frame, variant, plan_prefix="wait_coord") -> None:
 
 
 def direction(frame, tag) -> None:
-    changed = frame[(frame["source"] == "lhs") & (frame[f"{tag}_kind"] != "identical")]
+    changed = frame[(frame["source"] == "lhs") & (frame["statuses_ok"] == 1)
+                    & (frame[f"{tag}_kind"] != "identical")]
     if changed.empty:
         say("     none")
         return
@@ -399,9 +401,12 @@ def main() -> None:
     parser.add_argument("--n", type=int, default=300)
     parser.add_argument("--memory-points", type=int, default=40)
     parser.add_argument("--quick", action="store_true")
-    parser.add_argument("--time-limit", type=float, default=120.0)
+    # The default candidate set makes the budgeted models several times larger;
+    # 120 s left some solves unfinished when other jobs shared the machine.
+    parser.add_argument("--time-limit", type=float, default=900.0)
     parser.add_argument("--gap", type=float, default=1e-6)
     parser.add_argument("--serve-first", action="store_true")
+    parser.add_argument("--path-strategy", default="candidates", choices=["candidates", "legacy"])
     args = parser.parse_args()
 
     budgets = [UNLIMITED, 20, 10]
@@ -411,6 +416,8 @@ def main() -> None:
     if args.quick:
         n, memory_points = 6, 2
         suffix += "_quick"
+    if args.path_strategy != "candidates":
+        suffix += f"_{args.path_strategy}"
 
     say("=" * 78)
     say("W5: DOES THE COHERENCE GATE NEED TO BOUND WAITING TIME?")
@@ -418,7 +425,9 @@ def main() -> None:
     say(f"   objective: {'serve_first' if args.serve_first else 'published (serving optional)'}")
 
     topo = build_ca9(spacing_km=80.0)
-    paths = enumerate_paths(topo, topo.demand_pairs(), max_link_km=300.0, max_hops=20)
+    paths = enumerate_paths(topo, topo.demand_pairs(), max_link_km=300.0, max_hops=20,
+                            strategy=args.path_strategy)
+    say(f"   candidate paths ({args.path_strategy}): {path_statistics(paths)}")
 
     def preset(name, hw):
         return {"id": name, "source": name, "hardware": hw,

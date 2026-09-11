@@ -160,7 +160,7 @@ class TestCoordinatedRate:
         assert rate == pytest.approx(1000.0 * 0.9**2, rel=0.05)
 
     def test_coordinated_below_paper_model_everywhere(self):
-        """The coordinated model must be the conservative side of the bracket."""
+        """The coordinated model must sit below Eq. (2)'s pipelined rate."""
         import random
 
         rng = random.Random(7)

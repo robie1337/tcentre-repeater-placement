@@ -46,6 +46,7 @@ class SweepContext:
     backend: str = "highs"
     mip_gap: float = 1e-4
     time_limit_s: float | None = 60.0
+    path_strategy: str = "candidates"
 
     @classmethod
     def build(
@@ -56,18 +57,21 @@ class SweepContext:
         config: NetworkConfig | None = None,
         base_hardware: Hardware | None = None,
         bridge: bool = False,
+        path_strategy: str = "candidates",
         **kwargs,
     ) -> "SweepContext":
         from .hardware import TCENTRE_MIDRANGE
 
         topology = build_ca9(spacing_km=spacing_km, bridge=bridge)
         pairs = topology.demand_pairs()
-        paths = enumerate_paths(topology, pairs, max_link_km=max_link_km, max_hops=max_hops)
+        paths = enumerate_paths(topology, pairs, max_link_km=max_link_km, max_hops=max_hops,
+                                strategy=path_strategy)
         return cls(
             topology=topology,
             paths=paths,
             config=config or NetworkConfig(),
             base_hardware=base_hardware or TCENTRE_MIDRANGE,
+            path_strategy=path_strategy,
             **kwargs,
         )
 
@@ -104,6 +108,10 @@ def evaluate(context: SweepContext, values: dict[str, float]) -> dict:
         n_model_vars=result.n_model_vars,
         solve_seconds=elapsed,
         repeaters=";".join(result.repeaters),
+        mip_gap=result.mip_gap,
+        backend=result.backend,
+        rate_model=context.config.rate_model,
+        path_strategy=context.path_strategy,
     )
     if result.selections:
         record["mean_hops"] = float(np.mean([s["hops"] for s in result.selections]))

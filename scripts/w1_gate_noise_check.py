@@ -2,13 +2,15 @@
 
 Eq. (5) carries a per-swap factor P_2 (4 eta^2 - 1) / 3. Pouryousef sets the
 gate fidelity P_2 and measurement fidelity eta to approximately 1 and says so.
-The T centre has measured values for both, and substituting them changes the
-answer far more than any of the four parameters this project claims to sweep.
 
 The presets in hardware.py keep both at 1.0, so that the only differences
 from the paper's baseline are attenuation, link fidelity, swap success and
-coherence. This script measures what that choice is worth, which is the
-honest way to report an assumption that consequential.
+coherence. This script measures what that choice is worth.
+
+The noisy pair it substitutes is LEGACY and MISATTRIBUTED: the 0.986 gate
+fidelity is a T centre value, but the 0.946 readout is a single erbium ion
+(see qrp.legacy). The script is kept so the earlier numbers can be
+reproduced; the swap-quality bracket in SWEEP_BOUNDS supersedes it.
 
 Run:  python scripts/w1_gate_noise_check.py
 """
@@ -19,11 +21,8 @@ import pandas as pd
 
 from _common import banner, save_frame, step
 from qrp import physics, topology
-from qrp.hardware import (
-    GATE_NOISE_MEASURED,
-    TCENTRE_MIDRANGE,
-    TCENTRE_PROJECTED,
-)
+from qrp.hardware import TCENTRE_MIDRANGE, TCENTRE_PROJECTED
+from qrp.legacy import LEGACY_MISATTRIBUTED_GATE_READOUT as GATE_READOUT
 from qrp.model import NetworkConfig, solve_placement
 from qrp.paths import enumerate_paths
 
@@ -50,15 +49,15 @@ def max_hops_before_floor(link_fidelity, gate, meas, limit=200):
 def main() -> None:
     banner("WEEK 1: sensitivity to the gate and measurement fidelity assumption")
 
-    print("Measured T centre values used in the comparison:")
-    print(f"   two-qubit gate fidelity  P_2  = {GATE_NOISE_MEASURED['gate_fidelity']}"
-          "   (Afzal 2024)")
-    print(f"   measurement fidelity     eta  = {GATE_NOISE_MEASURED['measurement_fidelity']}"
-          "   (Higginbottom 2022, single-shot electron readout)")
+    print("Legacy gate and readout pair used in the comparison:")
+    print(f"   two-qubit gate fidelity  P_2  = {GATE_READOUT['gate_fidelity']}"
+          "   (Afzal 2024, T centre)")
+    print(f"   measurement fidelity     eta  = {GATE_READOUT['measurement_fidelity']}"
+          "   (erbium ion, Raha et al. 2020; NOT a T centre value)")
 
     swap_factor = (
-        GATE_NOISE_MEASURED["gate_fidelity"]
-        * (4 * GATE_NOISE_MEASURED["measurement_fidelity"] ** 2 - 1)
+        GATE_READOUT["gate_fidelity"]
+        * (4 * GATE_READOUT["measurement_fidelity"] ** 2 - 1)
         / 3
     )
     print(f"   per-swap Werner factor        = {swap_factor:.4f}  (1.0 when both are perfect)")
@@ -69,10 +68,10 @@ def main() -> None:
         perfect = max_hops_before_floor(fidelity, 1.0, 1.0)
         noisy = max_hops_before_floor(
             fidelity,
-            GATE_NOISE_MEASURED["gate_fidelity"],
-            GATE_NOISE_MEASURED["measurement_fidelity"],
+            GATE_READOUT["gate_fidelity"],
+            GATE_READOUT["measurement_fidelity"],
         )
-        rows.append({"case": label, "max_hops_perfect": perfect, "max_hops_measured": noisy})
+        rows.append({"case": label, "max_hops_perfect": perfect, "max_hops_legacy_pair": noisy})
         print(f"   {label:<24} {perfect:>3} hops -> {noisy:>3} hops")
 
     save_frame(pd.DataFrame(rows), "w1_gate_noise_hops.csv")
@@ -86,7 +85,7 @@ def main() -> None:
     for label, base in [("midrange", TCENTRE_MIDRANGE), ("projected", TCENTRE_PROJECTED)]:
         for assumption, overrides in [
             ("perfect gates (used in this project)", {}),
-            ("measured T centre gates", GATE_NOISE_MEASURED),
+            ("legacy pair (misattributed readout)", GATE_READOUT),
         ]:
             hardware = base.with_(**overrides) if overrides else base
             result = solve_placement(topo, paths, hardware, CONFIG)
@@ -107,19 +106,14 @@ def main() -> None:
     save_frame(frame, "w1_gate_noise_effect.csv")
 
     step("What this means")
-    print("   Substituting the measured gate and readout fidelities changes the")
-    print("   result by more than any of the four parameters being swept. Two")
-    print("   things follow.")
+    print("   The noisy pair changes the result by more than any of the four")
+    print("   swept parameters, but its readout figure is from the wrong")
+    print("   platform. The five-parameter sweep with swap quality in")
+    print("   [0.71, 0.997] is the defensible version of this check.")
     print()
-    print("   First, this project keeps both at 1.0, matching the paper, so that")
-    print("   the comparison with published results isolates the four intended")
-    print("   changes. The report states this rather than burying it.")
-    print()
-    print("   Second, an open question: is single-shot electron readout")
-    print("   fidelity the right quantity for eta in Eq. (5)? Eq. (5) wants the")
-    print("   fidelity of the Bell-state measurement that performs the swap.")
-    print("   Those are not obviously the same number, and the difference")
-    print("   decides whether the T centre can support long chains at all.")
+    print("   An open question remains: Eq. (5) wants the fidelity of the")
+    print("   Bell-state measurement that performs the swap, which is not")
+    print("   obviously the same number as any single-shot readout fidelity.")
 
     banner("GATE NOISE CHECK COMPLETE")
 

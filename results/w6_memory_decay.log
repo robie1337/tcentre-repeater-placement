@@ -1,15 +1,16 @@
 ==============================================================================
 W6: WAITING TIME AS GRADUAL DECAY, AT THE MEASURED NUCLEAR T2
 ==============================================================================
+   candidate paths (candidates): 549 candidate paths over 18 pairs (8 to 71 per pair), hop counts 1 to 20
 
 -- midrange, T2 10 ms (preset)
-   budget unlimited | published 12 pairs 54 repeaters, median storage/T2 2.73
+   budget unlimited | published 12 pairs 54 repeaters, median storage/T2 3.36
      hard gate : 11 published pairs over T2 | plan  3 pairs  7 repeaters
-     decay, one pair waits (optimistic): published mean F -> 0.500, 12 pairs fall to F <= 1/2 | plan  2 pairs  4 repeaters
+     decay, one pair waits (optimistic): published mean F -> 0.501, 11 pairs fall to F <= 1/2 | plan  2 pairs  4 repeaters
      decay, all pairs wait (pessimistic): published plan mean F 0.785 -> 0.500, 12 pairs fall to F <= 1/2 | decay-aware plan  2 pairs  4 repeaters, 0 rerouted, 2 re-widthed, regret 8.33 bits/pair
-   budget        20 | published  7 pairs 18 repeaters, median storage/T2 1.83
+   budget        20 | published  7 pairs 18 repeaters, median storage/T2 1.57
      hard gate :  4 published pairs over T2 | plan  3 pairs  7 repeaters
-     decay, one pair waits (optimistic): published mean F -> 0.509, 6 pairs fall to F <= 1/2 | plan  2 pairs  4 repeaters
+     decay, one pair waits (optimistic): published mean F -> 0.502, 6 pairs fall to F <= 1/2 | plan  2 pairs  4 repeaters
      decay, all pairs wait (pessimistic): published plan mean F 0.811 -> 0.500, 7 pairs fall to F <= 1/2 | decay-aware plan  2 pairs  4 repeaters, 0 rerouted, 2 re-widthed, regret 8.33 bits/pair
    budget        10 | published  5 pairs 10 repeaters, median storage/T2 2.19
      hard gate :  3 published pairs over T2 | plan  3 pairs  7 repeaters
@@ -17,27 +18,27 @@ W6: WAITING TIME AS GRADUAL DECAY, AT THE MEASURED NUCLEAR T2
      decay, all pairs wait (pessimistic): published plan mean F 0.850 -> 0.509, 4 pairs fall to F <= 1/2 | decay-aware plan  2 pairs  4 repeaters, 0 rerouted, 1 re-widthed, regret 4.53 bits/pair
 
 -- midrange, T2 112 ms (measured)
-   budget unlimited | published 12 pairs 54 repeaters, median storage/T2 0.26
+   budget unlimited | published 12 pairs 54 repeaters, median storage/T2 0.21
      hard gate :  0 published pairs over T2 | plan 12 pairs 54 repeaters
-     decay, one pair waits (optimistic): published mean F -> 0.607, 2 pairs fall to F <= 1/2 | plan  9 pairs 39 repeaters
-     decay, all pairs wait (pessimistic): published plan mean F 0.785 -> 0.540, 9 pairs fall to F <= 1/2 | decay-aware plan  4 pairs 11 repeaters, 0 rerouted, 4 re-widthed, regret 4.25 bits/pair
+     decay, one pair waits (optimistic): published mean F -> 0.618, 3 pairs fall to F <= 1/2 | plan  9 pairs 39 repeaters
+     decay, all pairs wait (pessimistic): published plan mean F 0.785 -> 0.548, 8 pairs fall to F <= 1/2 | decay-aware plan  4 pairs 11 repeaters, 0 rerouted, 3 re-widthed, regret 2.97 bits/pair
    budget        20 | published  7 pairs 18 repeaters, median storage/T2 0.14
      hard gate :  0 published pairs over T2 | plan  7 pairs 18 repeaters
-     decay, one pair waits (optimistic): published mean F -> 0.694, 0 pairs fall to F <= 1/2 | plan  7 pairs 18 repeaters
+     decay, one pair waits (optimistic): published mean F -> 0.693, 0 pairs fall to F <= 1/2 | plan  7 pairs 18 repeaters
      decay, all pairs wait (pessimistic): published plan mean F 0.811 -> 0.608, 4 pairs fall to F <= 1/2 | decay-aware plan  4 pairs 11 repeaters, 0 rerouted, 2 re-widthed, regret 2.12 bits/pair
-   budget        10 | published  5 pairs 10 repeaters, median storage/T2 0.12
+   budget        10 | published  5 pairs 10 repeaters, median storage/T2 0.20
      hard gate :  1 published pairs over T2 | plan  4 pairs  9 repeaters
-     decay, one pair waits (optimistic): published mean F -> 0.693, 1 pairs fall to F <= 1/2 | plan  4 pairs  9 repeaters
-     decay, all pairs wait (pessimistic): published plan mean F 0.850 -> 0.643, 2 pairs fall to F <= 1/2 | decay-aware plan  3 pairs  7 repeaters, 1 rerouted, 1 re-widthed, regret 1.49 bits/pair
+     decay, one pair waits (optimistic): published mean F -> 0.686, 1 pairs fall to F <= 1/2 | plan  4 pairs  9 repeaters
+     decay, all pairs wait (pessimistic): published plan mean F 0.850 -> 0.632, 3 pairs fall to F <= 1/2 | decay-aware plan  3 pairs  7 repeaters, 1 rerouted, 1 re-widthed, regret 3.17 bits/pair
 
 -- projected, T2 100 ms (preset)
-   budget unlimited | published 18 pairs 47 repeaters, median storage/T2 0.54
+   budget unlimited | published 18 pairs 47 repeaters, median storage/T2 0.52
      hard gate :  1 published pairs over T2 | plan 17 pairs 47 repeaters
-     decay, one pair waits (optimistic): published mean F -> 0.615, 9 pairs fall to F <= 1/2 | plan 14 pairs 47 repeaters
-     decay, all pairs wait (pessimistic): published plan mean F 0.980 -> 0.546, 13 pairs fall to F <= 1/2 | decay-aware plan  6 pairs 20 repeaters, 1 rerouted, 2 re-widthed, regret 2.30 bits/pair
-   budget        20 | published 11 pairs 20 repeaters, median storage/T2 0.50
+     decay, one pair waits (optimistic): published mean F -> 0.621, 9 pairs fall to F <= 1/2 | plan 14 pairs 47 repeaters
+     decay, all pairs wait (pessimistic): published plan mean F 0.980 -> 0.539, 14 pairs fall to F <= 1/2 | decay-aware plan  6 pairs 20 repeaters, 1 rerouted, 4 re-widthed, regret 4.12 bits/pair
+   budget        20 | published 11 pairs 20 repeaters, median storage/T2 0.36
      hard gate :  0 published pairs over T2 | plan 11 pairs 20 repeaters
-     decay, one pair waits (optimistic): published mean F -> 0.648, 5 pairs fall to F <= 1/2 | plan  8 pairs 20 repeaters
+     decay, one pair waits (optimistic): published mean F -> 0.656, 5 pairs fall to F <= 1/2 | plan  8 pairs 20 repeaters
      decay, all pairs wait (pessimistic): published plan mean F 0.982 -> 0.582, 7 pairs fall to F <= 1/2 | decay-aware plan  6 pairs 20 repeaters, 1 rerouted, 3 re-widthed, regret 3.52 bits/pair
    budget        10 | published  5 pairs 10 repeaters, median storage/T2 0.13
      hard gate :  1 published pairs over T2 | plan  4 pairs  9 repeaters
@@ -45,13 +46,13 @@ W6: WAITING TIME AS GRADUAL DECAY, AT THE MEASURED NUCLEAR T2
      decay, all pairs wait (pessimistic): published plan mean F 0.992 -> 0.693, 2 pairs fall to F <= 1/2 | decay-aware plan  4 pairs  9 repeaters, 0 rerouted, 2 re-widthed, regret 1.43 bits/pair
 
 -- projected, T2 112 ms (measured)
-   budget unlimited | published 18 pairs 47 repeaters, median storage/T2 0.48
+   budget unlimited | published 18 pairs 47 repeaters, median storage/T2 0.46
      hard gate :  1 published pairs over T2 | plan 17 pairs 47 repeaters
-     decay, one pair waits (optimistic): published mean F -> 0.627, 7 pairs fall to F <= 1/2 | plan 14 pairs 47 repeaters
-     decay, all pairs wait (pessimistic): published plan mean F 0.980 -> 0.552, 13 pairs fall to F <= 1/2 | decay-aware plan  6 pairs 20 repeaters, 1 rerouted, 2 re-widthed, regret 2.33 bits/pair
-   budget        20 | published 11 pairs 20 repeaters, median storage/T2 0.44
+     decay, one pair waits (optimistic): published mean F -> 0.631, 8 pairs fall to F <= 1/2 | plan 14 pairs 47 repeaters
+     decay, all pairs wait (pessimistic): published plan mean F 0.980 -> 0.544, 14 pairs fall to F <= 1/2 | decay-aware plan  6 pairs 20 repeaters, 1 rerouted, 4 re-widthed, regret 4.27 bits/pair
+   budget        20 | published 11 pairs 20 repeaters, median storage/T2 0.32
      hard gate :  0 published pairs over T2 | plan 11 pairs 20 repeaters
-     decay, one pair waits (optimistic): published mean F -> 0.661, 3 pairs fall to F <= 1/2 | plan  9 pairs 20 repeaters
+     decay, one pair waits (optimistic): published mean F -> 0.666, 4 pairs fall to F <= 1/2 | plan  9 pairs 20 repeaters
      decay, all pairs wait (pessimistic): published plan mean F 0.982 -> 0.588, 7 pairs fall to F <= 1/2 | decay-aware plan  6 pairs 20 repeaters, 1 rerouted, 3 re-widthed, regret 3.68 bits/pair
    budget        10 | published  5 pairs 10 repeaters, median storage/T2 0.12
      hard gate :  1 published pairs over T2 | plan  4 pairs  9 repeaters

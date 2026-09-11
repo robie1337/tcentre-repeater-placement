@@ -111,10 +111,10 @@ POURYOUSEF_BASELINE = Hardware(
 # two-qubit gate fidelity and eta the measurement fidelity. Pouryousef sets
 # both to approximately 1 and says so.
 #
-# The T centre has measured values for both: gate fidelity 98.4 to 98.6 per
-# cent (Afzal 2024) and a single-shot electron readout figure of 94.6 per
-# cent long attributed here to Higginbottom 2022 -- see GATE_NOISE_MEASURED
-# below, that attribution is now confirmed wrong. Substituting them changes
+# The T centre gate fidelity is measured at 98.4 to 98.6 per cent (Afzal
+# 2024). A single-shot readout figure of 94.6 per cent was long attributed
+# here to Higginbottom 2022; it is an erbium-ion result, and qrp.legacy holds
+# the details. Substituting the pair changes
 # the per-swap factor from
 # 1.0 to 0.848, which is severe: the number of hops a path can carry before
 # its fidelity falls to the classical floor of 1/2 drops from 20 to 5 at
@@ -171,18 +171,10 @@ TCENTRE_PROJECTED = Hardware(
     t_endnode_memory_s=100e-3,
 )
 
-#: Measured T centre gate and readout values, for the sensitivity check.
-#: Gate fidelity 98.6 per cent is Afzal 2024. The 0.946 readout figure is
-#: MISATTRIBUTED and is RETAINED ONLY FOR REPRODUCIBILITY of the earlier
-#: check. Confirmed 2026-08-24: arXiv:2103.07580 (Kurkjian/Higginbottom et
-#: al., published as Higginbottom et al., Nature 607, 266 (2022)) reports no
-#: readout fidelity, and 94.6 per cent is the single-shot QND readout of a
-#: single ERBIUM ion in Raha, Chen, Phenicie, Ourari, Dibos & Thompson,
-#: Nat. Commun. 11, 1605 (2020). Wrong platform entirely. The defensible
-#: measured floor is Afzal 2024's nuclear SPAM of 0.87-0.89; the sweep
-#: bracket in SWEEP_BOUNDS["swap_werner"] supersedes this pair. Do not cite
-#: 0.946 anywhere in the report.
-GATE_NOISE_MEASURED = {"gate_fidelity": 0.986, "measurement_fidelity": 0.946}
+# The gate and readout pair once used by scripts/w1_gate_noise_check.py is not
+# here. Its 0.946 readout figure is an erbium-ion measurement, so it lives in
+# qrp.legacy under a name that says so, and SWEEP_BOUNDS["swap_werner"]
+# replaces it.
 
 
 # --------------------------------------------------------------------------

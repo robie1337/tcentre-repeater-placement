@@ -27,7 +27,10 @@ taken unchanged from Pouryousef et al., IEEE TQE 2024, arXiv:2308.16264v3.
 
 The only intended change is `alpha`, from 0.2 dB/km to 0.35 dB/km, with
 `F_L`, `q_s`, `R_gen` and `T2` swept across ranges bracketed by published
-measurements rather than fixed at assumed values.
+measurements rather than fixed at assumed values. The four are sampled
+independently, so the sweep is a sensitivity box: real devices correlate
+these parameters, and not every sampled combination is one anyone has built
+or projected.
 
 The answer has to clear four bars.
 

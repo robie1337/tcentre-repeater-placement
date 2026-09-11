@@ -165,10 +165,11 @@ def rate_approximation_ratio(width: int, p_min: float) -> float:
 # waits for the slowest link: the expected number of rounds is E[max of h
 # geometric variables]. A failed swap is assumed to force a full restart,
 # which divides the rate by q_s^(h-1). Both choices are conservative, so
-# this is a lower-bound style model to bracket against Eq. (2)'s optimistic
-# pipelined model. Exact citations for each component are recorded in the
-# report; the geometric maximum is evaluated through the standard
-# exponential order-statistics integral.
+# this is a conservative reference model to compare with Eq. (2)'s optimistic
+# pipelined model. Nothing here proves the physical rate lies between them.
+# Exact citations for each component are recorded in the report; the
+# geometric maximum is evaluated through the standard exponential
+# order-statistics integral.
 
 
 def link_success_multiplexed(p: float, width: int) -> float:
@@ -236,7 +237,8 @@ def e2e_rate_coordinated(
     At high W*p this tends to R_att * q_s^(h-1) (one pair per round, no
     pipelining), which is below Eq. (2)'s multiplexed throughput; at low
     W*p it decays like W*p / H_h rather than pretending each round yields
-    W*p pairs. Together the two formulas bracket the truth.
+    W*p pairs. The two formulas are reference approximations, not proven
+    bounds on the physical rate.
     """
     if hops < 1:
         raise ValueError(f"hops must be >= 1, got {hops}")
@@ -274,7 +276,7 @@ def e2e_rate_ext(
     probability that every link fires in the same round becomes the product
     of small numbers. It is conservative for long-coherence memories, which
     could buffer pairs across rounds; the coordinated model above covers
-    that reading, and the two straddle the plausible middle ground.
+    that reading. The two are reference approximations, not proven bounds.
     """
     import numpy as np
     from scipy.stats import binom

@@ -1,16 +1,16 @@
-﻿
+
 ==============================================================================
 WEEK 1 VALIDATION: reproducing Pouryousef et al., IEEE TQE 2024
 ==============================================================================
-Hardware: alpha_db_per_km=0.2, link_fidelity=0.95, swap_success=0.5, generation_rate_hz=1.0, t_repeater_memory_s=inf, t_endnode_memory_s=inf, gate_fidelity=1.0, measurement_fidelity=1.0, eta_emission=1.0, eta_detection=1.0
+Hardware: alpha_db_per_km=0.2, link_fidelity=0.95, swap_success=0.5, generation_rate_hz=1.0, t_repeater_memory_s=inf, t_endnode_memory_s=inf, gate_fidelity=1.0, measurement_fidelity=1.0, eta_emission=1.0, eta_detection=1.0, swap_werner=None
 
--- Check 1: the backbone length below which no repeater is placed
-   first repeater appears at 40.0 km
+-- Check 1: the backbone length below which no repeater is placed [paper baseline]
+   first repeater appears at 38.5 km
    paper reports the transition at roughly 40 km
    analytic crossover for this discretisation: 38.3 km
    PASS  model matches its own analytic crossover
    PASS  transition is in the paper's neighbourhood of 40 km
-   wrote results\w1_backbone_threshold.csv  (80 rows)
+   wrote results\w1_backbone_threshold.csv  (409 rows)
 
 -- Check 2: the end-node coherence cliff
      200 km path: cliff at  2.006 ms, 2L/c =  2.000 ms
@@ -18,10 +18,12 @@ Hardware: alpha_db_per_km=0.2, link_fidelity=0.95, swap_success=0.5, generation_
      320 km path: cliff at  3.267 ms, 2L/c =  3.200 ms
      400 km path: cliff at  4.078 ms, 2L/c =  4.000 ms
 
-   The paper reports 3.2 ms for SURFnet, whose user pairs are
-   200 to 250 km apart. A 320 km fibre path gives 2L/c = 3.20 ms,
-   which is where our cliff lands. That agreement is evidence that
-   the reconstructed tau_e2e in physics.py has the right form.
+   This shows the cliff obeys 2L/c on a straight line of fibre. It
+   is an internal consistency check of the timing model, not a
+   reproduction of anything published: picking a length that gives
+   the paper's 3.2 ms would be circular.
+   The real comparison, on the authors' own SURFnet topology with
+   their measured fibre lengths, is scripts/w1_surfnet_cliff.py.
    PASS  cliff tracks 2L/c across every path length tested
    wrote results\w1_coherence_cliff.csv  (4 rows)
 

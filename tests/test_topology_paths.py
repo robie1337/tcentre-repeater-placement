@@ -88,65 +88,100 @@ class TestLogicalGraph:
         assert logical["A"]["R3"]["bypassed"] == ("R1", "R2")
 
 
+SEGMENT_KM = 880.0 / 11
+
+
+def _dumbbell(strategy):
+    topo = topo_mod.build_dumbbell(880.0, n_candidates=10)
+    pairs = topo.demand_pairs()
+    return paths_mod.enumerate_paths(
+        topo, pairs, max_link_km=300.0, max_hops=11, strategy=strategy
+    )
+
+
 class TestPathEnumeration:
     @staticmethod
     @pytest.fixture(scope="class")
     def dumbbell_paths():
-        topo = topo_mod.build_dumbbell(880.0, n_candidates=10)
-        pairs = topo.demand_pairs()
-        return topo, paths_mod.enumerate_paths(topo, pairs, max_link_km=300.0, max_hops=11)
+        return _dumbbell("candidates")
 
     def test_returns_paths_for_every_pair(self, dumbbell_paths):
-        _, result = dumbbell_paths
-        assert all(len(v) > 0 for v in result.values())
+        assert all(len(v) > 0 for v in dumbbell_paths.values())
 
     def test_endpoints_are_correct(self, dumbbell_paths):
-        _, result = dumbbell_paths
-        for (source, target), candidates in result.items():
+        for (source, target), candidates in dumbbell_paths.items():
             for path in candidates:
                 assert path.nodes[0] == source
                 assert path.nodes[-1] == target
 
     def test_paths_are_simple(self, dumbbell_paths):
-        _, result = dumbbell_paths
-        for candidates in result.values():
+        for candidates in dumbbell_paths.values():
             for path in candidates:
                 assert len(set(path.nodes)) == len(path.nodes)
 
     def test_link_count_matches_hops(self, dumbbell_paths):
-        _, result = dumbbell_paths
-        for candidates in result.values():
+        for candidates in dumbbell_paths.values():
             for path in candidates:
                 assert len(path.link_lengths_km) == path.hops
                 assert len(path.nodes) == path.hops + 1
                 assert len(path.repeaters) == path.hops - 1
 
-    def test_total_length_is_the_corridor_length(self, dumbbell_paths):
-        _, result = dumbbell_paths
+    def test_no_path_is_shorter_than_the_corridor(self, dumbbell_paths):
+        """Simple paths may double back, but none can beat the straight run."""
+        for candidates in dumbbell_paths.values():
+            for path in candidates:
+                assert path.total_km >= 880.0 - 1e-6
+
+    def test_frontier_points_are_present(self, dumbbell_paths):
+        """Every Pareto point over (hops, worst link) must be a candidate.
+
+        With links capped at 300 km a link spans at most 3 of the 11 segments,
+        so the frontier is 11 hops at 80 km, 6 at 160 km and 4 at 240 km.
+        """
+        kept = {(p.hops, round(p.max_link_km, 6))
+                for candidates in dumbbell_paths.values() for p in candidates}
+        for hops, segments in [(11, 1), (6, 2), (4, 3)]:
+            assert (hops, round(segments * SEGMENT_KM, 6)) in kept
+
+    def test_no_path_beats_the_physical_bound(self, dumbbell_paths):
+        """An h-hop path needs a link of at least ceil(11 / h) segments."""
+        for candidates in dumbbell_paths.values():
+            for path in candidates:
+                bound = SEGMENT_KM * -(-11 // path.hops)
+                assert path.max_link_km >= bound - 1e-6
+
+    def test_ca9_enumeration_runs(self):
+        topo = topo_mod.build_ca9()
+        pairs = topo.demand_pairs()
+        result = paths_mod.enumerate_paths(topo, pairs, max_link_km=300.0, max_hops=20)
+        assert len(result) == len(pairs)
+        assert sum(len(v) for v in result.values()) > 0
         for candidates in result.values():
             for path in candidates:
-                assert path.total_km == pytest.approx(880.0)
+                assert len(set(path.nodes)) == len(path.nodes)
+                assert path.hops <= 20
 
-    def test_bottleneck_optimality(self, dumbbell_paths):
-        """The kept path for each hop count must minimise its longest link.
 
-        On an evenly spaced chain of 11 segments, the best h-hop split has a
-        longest link of ceil(11 / h) segments.
-        """
-        _, result = dumbbell_paths
-        segment = 880.0 / 11
+class TestLegacyStrategy:
+    """The pre-September-2026 generator, kept to reproduce committed results."""
+
+    @staticmethod
+    @pytest.fixture(scope="class")
+    def legacy_paths():
+        return _dumbbell("legacy")
+
+    def test_bottleneck_optimality(self, legacy_paths):
+        """The kept path for each hop count minimises its longest link."""
         by_hops = {}
-        for candidates in result.values():
+        for candidates in legacy_paths.values():
             for path in candidates:
                 by_hops.setdefault(path.hops, []).append(path.max_link_km)
         for hops, values in by_hops.items():
-            expected = segment * -(-11 // hops)  # ceiling division
-            assert min(values) == pytest.approx(expected)
+            assert min(values) == pytest.approx(SEGMENT_KM * -(-11 // hops))
 
-    def test_dominated_paths_are_dropped(self, dumbbell_paths):
+    def test_dominated_paths_are_dropped(self, legacy_paths):
         """No kept path may be beaten on hops and worst link at once."""
-        _, result = dumbbell_paths
-        for candidates in result.values():
+        for candidates in legacy_paths.values():
             for a in candidates:
                 for b in candidates:
                     if a is b:
@@ -158,9 +193,12 @@ class TestPathEnumeration:
                     )
                     assert not strictly_better
 
-    def test_ca9_enumeration_runs(self):
-        topo = topo_mod.build_ca9()
-        pairs = topo.demand_pairs()
-        result = paths_mod.enumerate_paths(topo, pairs, max_link_km=300.0, max_hops=20)
-        assert len(result) == len(pairs)
-        assert sum(len(v) for v in result.values()) > 0
+    def test_total_length_is_the_corridor_length(self, legacy_paths):
+        for candidates in legacy_paths.values():
+            for path in candidates:
+                assert path.total_km == pytest.approx(880.0)
+
+    def test_unknown_strategy_is_rejected(self):
+        topo = topo_mod.build_dumbbell(220.0, n_candidates=3)
+        with pytest.raises(ValueError):
+            paths_mod.enumerate_paths(topo, topo.demand_pairs(), strategy="fastest")

@@ -6,14 +6,20 @@ and a binary `r` per candidate repeater location. Utility is
 is evaluated offline and enters as a constant coefficient. That is the
 paper's own device and it keeps the program linear.
 
-Candidate paths come from an exact dynamic program rather than the k-shortest
-paths heuristic the paper uses. For a path with h links the fidelity depends
-only on h, and the rate is proportional to the success probability of the
-worst link, so among all h-link paths the best one is whichever minimises its
-longest link. That is a bottleneck shortest path with a hop constraint, and
-it is solvable exactly. Paths beaten on both hop count and worst link are
-dropped, which is a strict dominance and cuts the candidate set by about 60
-per cent.
+Candidate paths come from `paths.enumerate_paths`, and no affordable
+candidate set is exact for the network problem. Repeater memory and the
+repeater budget are shared between pairs, so a path that is worse on its own
+can be the one the global optimum needs, and the low-W*p rate models depend on
+every link, not only the worst one. The default generator keeps the exact
+Pareto frontier over hop count and worst link, with tied alternatives through
+different repeaters and one hop of slack, plus the shortest simple paths
+within the hop limit by total length and by summed loss. Nothing is pruned
+for being dominated.
+`tests/test_candidate_paths.py` checks the set against exhaustive enumeration
+on small random networks and includes a network where pruning a dominated path
+loses a pair. Results committed before September 2026 used an older generator,
+still available as `strategy="legacy"`, which discarded ties, lost hop counts
+whose best walk revisited a node, and pruned dominated paths.
 
 
 ## Why there is no simulator
@@ -54,13 +60,15 @@ above supports it. Check it against Section II-A before the report goes out;
 if it is wrong, one function changes.
 
 **Gate and measurement fidelity are held at 1.0.** Eq. (5) carries a per-swap
-factor `P_2 (4 eta^2 - 1) / 3`. The paper sets both to approximately 1. The T
-centre has measured values, 98.6 per cent gate fidelity and 94.6 per cent
-single-shot readout, and substituting them changes the result by more than
-any parameter this project sweeps: the hop budget falls from 20 to 5 at
-F_L = 0.96, and the projected hardware goes from serving all 18 user pairs to
-serving 11. The presets keep both at 1.0 so that the only differences from the
-paper's baseline are the four intended ones.
+factor `P_2 (4 eta^2 - 1) / 3`. The paper sets both to approximately 1. The
+presets keep both at 1.0 so that the only differences from the paper's
+baseline are the four intended ones. The T centre gate fidelity has been
+measured at 98.6 per cent. An earlier check paired it with a 94.6 per cent
+readout figure that turned out to be a single erbium ion, not a T centre (see
+VALIDATION.md). That pair now lives in `qrp.legacy` under a name that says it
+is misattributed, and the swap-quality bracket [0.71, 0.997] in `SWEEP_BOUNDS`
+replaces it. With the legacy pair the hop budget fell from 20 to 5 at
+F_L = 0.96; that number describes the misattributed input, not the hardware.
 
 `w1_gate_noise_check.py` measures the effect rather than ignoring it. **An
 open question:** Eq. (5) wants the fidelity of the Bell state
@@ -94,6 +102,13 @@ served becomes the output and the contour where it drops below eighteen is
 exactly the feasibility boundary. The validation runs, which need the
 infeasibility cliff, keep the requirement on.
 
+**A time limit is not infeasibility.** Every solve reports one of `optimal`,
+`feasible_at_limit`, `no_incumbent_at_limit`, `infeasible`, `unbounded`,
+`error` or `too_large`, with the gap and bound kept separately. Only
+`infeasible` carries the paper's -50 sentinel; a solve that did not finish
+reports NaN, and the Sobol analysis refuses to run on unresolved solves unless
+told to treat them as infeasible on purpose.
+
 
 ## Where the hardware numbers come from
 
@@ -106,4 +121,8 @@ infeasibility cliff, keep the requirement on.
 | O band attenuation | 0.35 dB/km | Corning SMF-28 at 1326 nm |
 
 Every bound is bracketed by a published measurement on some platform, so none
-of the ranges are invented.
+of the ranges are invented. The parameters are sampled independently inside
+those bounds. That makes the sweep a mathematical sensitivity box, not a map of
+realisable devices: swap success and swap quality, for instance, are likely
+correlated in real hardware, and the box includes combinations no device has
+shown.

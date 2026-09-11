@@ -4,6 +4,11 @@ Numbers come from 6,144 Saltelli solves, 1,728 grid solves, 500 Latin
 hypercube solves, and the threshold scans. The pipeline runs in about five
 minutes on six cores.
 
+Every result here is for the abstract nine-city topology, with candidate sites
+evenly spaced every 80 km, not a surveyed carrier map. Every hardware sample
+comes from a box in which the four parameters vary independently, which
+includes combinations no device has shown.
+
 Coherence time dominates every outcome. Total-effect Sobol indices, as a
 share of variance explained:
 
@@ -139,19 +144,29 @@ at the measured nuclear T2 of 112 ms the cut-off removes nothing at midrange
 and one pair at projected.
 
 As gradual decay it binds at 112 ms too. `w6_memory_decay.py` decays the
-Werner parameter by `exp(-t / T2)` per stored qubit and brackets the swap
-schedule between one pair idling and every pair idling:
+Werner parameter by `exp(-t / T2)` per stored qubit and bounds the swap
+schedule two ways: one pair idling from the first link ready to the last,
+which any schedule incurs at least, and every pair idling until the last link
+is ready, which only covers schedules that swap no later than that:
 
 | Hardware, T2 = 112 ms | Published plan | One pair idles | Every pair idles |
 |---|---|---|---|
-| Midrange | 12 pairs, mean F 0.785 | F 0.607, 2 pairs at or below 1/2 | F 0.540, 9 pairs |
-| Projected | 18 pairs, mean F 0.980 | F 0.627, 7 pairs | F 0.552, 13 pairs |
+| Midrange | 12 pairs, mean F 0.785 | F 0.618, 3 pairs at or below 1/2 | F 0.548, 8 pairs |
+| Projected | 18 pairs, mean F 0.980 | F 0.631, 8 pairs | F 0.544, 14 pairs |
 
 Replanning with decay serves 9 and 14 pairs at the optimistic bound, 4 and 6
 at the pessimistic one. Waits well inside T2 still cost fidelity, and on
 routes of 12 to 19 hops the cost compounds.
 
 ## Limits
+
+Most numbers in this file were produced with the legacy candidate path
+generator, which discarded tied routes, lost some hop counts, and pruned
+routes the network optimum can need (MODEL.md). The W6 table above has been
+rerun on the default generator, with every pair and repeater count unchanged
+(VALIDATION.md). The Sobol indices, the sweeps, and the W4 and W5 figures
+have not yet been rerun. The O band threshold table uses two-node test
+networks and does not depend on the path generator.
 
 The waiting-time results rest on three assumptions: a link cannot retry
 before its herald returns, the nuclear memory decays at its idle echo T2

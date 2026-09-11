@@ -34,6 +34,7 @@ Run:  python scripts/w6_memory_decay.py
 
 from __future__ import annotations
 
+import argparse
 import dataclasses
 import math
 
@@ -45,7 +46,7 @@ import qrp.model as model_module
 from qrp import physics
 from qrp.hardware import TCENTRE_MIDRANGE, TCENTRE_PROJECTED
 from qrp.model import NetworkConfig
-from qrp.paths import enumerate_paths
+from qrp.paths import enumerate_paths, path_statistics
 from qrp.solver import solve
 from qrp.topology import build_ca9
 
@@ -133,8 +134,10 @@ def solve_mode(topo, paths, hardware, budget, mode, decay, storage):
         model_module.build_candidates = _ORIGINAL_BUILD
     if built is None:
         return []
-    result = solve(built.problem, backend="highs", time_limit_s=120.0, mip_gap=1e-6)
-    if not result.feasible:
+    # The default candidate set makes the budgeted models several times larger
+    # than the legacy ones; 120 s was not always enough to prove optimality.
+    result = solve(built.problem, backend="highs", time_limit_s=900.0, mip_gap=1e-6)
+    if not result.optimal:
         raise RuntimeError(f"{mode} budget {budget}: {result.status}")
     return [built.candidates[j] for j in range(built.n_candidates) if result.x[j] > 0.5]
 
@@ -148,8 +151,15 @@ def main() -> None:
     say("W6: WAITING TIME AS GRADUAL DECAY, AT THE MEASURED NUCLEAR T2")
     say("=" * 78)
 
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--path-strategy", default="candidates", choices=["candidates", "legacy"])
+    args = parser.parse_args()
+    suffix = "" if args.path_strategy == "candidates" else f"_{args.path_strategy}"
+
     topo = build_ca9(spacing_km=80.0)
-    paths = enumerate_paths(topo, topo.demand_pairs(), max_link_km=300.0, max_hops=MAX_HOPS)
+    paths = enumerate_paths(topo, topo.demand_pairs(), max_link_km=300.0, max_hops=MAX_HOPS,
+                            strategy=args.path_strategy)
+    say(f"   candidate paths ({args.path_strategy}): {path_statistics(paths)}")
     samples = np.random.default_rng(20260911).exponential(size=(N_SAMPLES, MAX_HOPS))
 
     def with_t2(hw, t2):
@@ -237,10 +247,10 @@ def main() -> None:
                 "opt_pairs": len(opt), "opt_repeaters": len(repeaters(opt)),
             })
 
-    save_frame(pd.DataFrame(rows), "w6_memory_decay.csv")
+    save_frame(pd.DataFrame(rows), f"w6_memory_decay{suffix}.csv")
     say("\n" + "=" * 78)
-    (RESULTS / "w6_memory_decay.log").write_text("\n".join(LINES) + "\n", encoding="utf-8")
-    print("   wrote results/w6_memory_decay.log")
+    (RESULTS / f"w6_memory_decay{suffix}.log").write_text("\n".join(LINES) + "\n", encoding="utf-8")
+    print(f"   wrote results/w6_memory_decay{suffix}.log")
 
 
 if __name__ == "__main__":

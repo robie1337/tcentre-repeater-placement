@@ -21,6 +21,7 @@ __version__ = "0.1.0"
 _SUBMODULES = (
     "figures",
     "hardware",
+    "legacy",
     "model",
     "paths",
     "physics",

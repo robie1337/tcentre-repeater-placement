@@ -49,7 +49,15 @@ import scipy.sparse as sp
 from . import physics
 from .hardware import Hardware
 from .paths import CandidatePath
-from .solver import INFEASIBLE_UTILITY, MilpProblem, SolveResult, solve
+from .solver import (
+    FEASIBLE_AT_LIMIT,
+    INFEASIBLE,
+    INFEASIBLE_UTILITY,
+    OPTIMAL,
+    MilpProblem,
+    SolveResult,
+    solve,
+)
 from .topology import Topology
 
 
@@ -89,8 +97,9 @@ class NetworkConfig:
     #: pipelined model, kept as the default so every validation reproduces.
     #: "ext" is Q-CAST's exact slotted throughput (Shi & Qian, SIGCOMM 2020),
     #: the literature-anchored low-W*p replacement. "coordinated" is the
-    #: buffered waiting-time model (Bernardes et al. 2011 structure). The
-    #: truth lies inside the bracket the three of them span.
+    #: buffered waiting-time model (Bernardes et al. 2011 structure). All three
+    #: are reference approximations; nothing here proves the physical rate
+    #: lies between them. Every sweep record names the model that produced it.
     rate_model: str = "paper"
 
     def widths(self) -> tuple[int, ...]:
@@ -381,14 +390,21 @@ class PlacementResult:
     backend: str = ""
     min_wp_min: float = float("nan")
     n_model_vars: int = 0
+    mip_gap: float = float("nan")
+    best_bound: float = float("nan")
 
     def summary(self) -> str:
-        if self.status != "optimal":
-            return f"{self.status}: utility set to sentinel {self.utility:g}"
-        return (
+        if self.status == INFEASIBLE:
+            return f"infeasible: utility set to sentinel {self.utility:g}"
+        if self.status not in (OPTIMAL, FEASIBLE_AT_LIMIT):
+            return f"{self.status}: no solution, which says nothing about the hardware"
+        text = (
             f"utility {self.utility:.3f} | {self.n_repeaters} repeaters | "
             f"{self.served_pairs}/{self.total_pairs} pairs served"
         )
+        if self.status == FEASIBLE_AT_LIMIT:
+            text += f" | not proven optimal (gap {self.mip_gap:.2%})"
+        return text
 
 
 def solve_placement(
@@ -417,16 +433,21 @@ def solve_placement(
     result: SolveResult = solve(
         model.problem, backend=backend, time_limit_s=time_limit_s, mip_gap=mip_gap
     )
-    if not result.feasible or result.x is None:
+    if not result.has_solution:
+        # Only a proven infeasible instance gets the paper's sentinel. A
+        # solve that stopped at a limit or failed says nothing about the
+        # hardware, so it reports NaN and keeps its own status.
         return PlacementResult(
             status=result.status,
-            utility=INFEASIBLE_UTILITY,
+            utility=INFEASIBLE_UTILITY if result.status == INFEASIBLE else float("nan"),
             n_repeaters=0,
             repeaters=[],
             served_pairs=0,
             total_pairs=total_pairs,
             backend=result.backend,
             n_model_vars=model.problem.n_vars,
+            mip_gap=result.mip_gap,
+            best_bound=result.best_bound,
         )
 
     x = result.x
@@ -466,7 +487,7 @@ def solve_placement(
         )
 
     return PlacementResult(
-        status="optimal",
+        status=result.status,
         utility=float(result.objective),
         n_repeaters=len(repeaters),
         repeaters=repeaters,
@@ -476,4 +497,6 @@ def solve_placement(
         backend=result.backend,
         min_wp_min=min(wp_values) if wp_values else float("nan"),
         n_model_vars=model.problem.n_vars,
+        mip_gap=result.mip_gap,
+        best_bound=result.best_bound,
     )

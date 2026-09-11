@@ -55,7 +55,7 @@ comparison, attributed, not a copy of their program.
 
 | Check | Paper | This model |
 |---|---|---|
-| Backbone length below which no repeater is placed | about 40 km | 40.0 km |
+| Backbone length below which no repeater is placed | about 40 km | 38.5 km |
 | End-node coherence below which nothing is feasible | 3.2 ms on SURFnet | 3.211 ms on SURFnet |
 | Three solvers, same objective | n/a | HiGHS, Gurobi and CPLEX agree to 1e-6 |
 
@@ -91,8 +91,15 @@ internal consistency check that the cliff obeys `2L/c`;
 
 CPLEX is included because it is the solver the paper used. The pip package is
 the Community Edition, free and needing no registration, capped at 1000
-variables. Every instance here fits: the full CA9 model is 809 variables,
-and all three solvers return 200.860328 on it.
+variables. The validation dumbbells fit, and all three solvers agree on them.
+The full CA9 model no longer does. Under the legacy path generator it was 809
+variables at the projected preset, and all three solvers returned 200.860328.
+Under the default generator it is 4,454 variables at the same preset and
+2,421 at midrange. HiGHS returns the same 200.860328 on the larger model, but
+both free licences refuse it: CPLEX Community reports `too_large`, and so does
+the size-limited Gurobi licence. Cross-solver agreement on CA9 therefore rests
+on the legacy-sized model, and on the larger one needs a full Gurobi or CPLEX
+licence.
 
 ### Against the authors' published code
 
@@ -199,6 +206,132 @@ Until it turns up, the verified claim is 112(12) ms.
 The sweep box's lower coherence bound of 1 ms sits below the measured
 electron echo of 0.41 ms. The bound is defensible only because the model
 assumes a nuclear memory, and the report has to say which memory it means.
+
+## Code review, September 2026
+
+An anonymous review of the repository found that two parts of the code did
+not do what the documentation said. Both are fixed and tested. Rerunning the
+affected results began on 11 September 2026. So far the preset CA9 solves
+and W6 have been rerun. W4, W5, the site-spacing check and the Sobol sweeps
+have not, and the answers below that would depend on them are left out until
+they are.
+
+### Solve outcomes
+
+The solver layer distinguished optimal, infeasible and error, and nothing
+else. A solve that stopped at its time limit had no status of its own, so it
+could carry the -50 utility the paper reserves for infeasible instances, and
+the Sobol analysis would have counted it as hardware that cannot work. Every
+backend now reports one of the seven statuses listed in MODEL.md, with gap and
+bound kept separately, and `tests/test_solver_status.py` checks the mapping
+for each backend.
+
+The committed result files record every solve as optimal or infeasible,
+apart from 18 W4 serve-first solves recorded as errors and left out of that
+analysis. The rerun turned up one more gap: the size-limited Gurobi licence
+raised an exception on a large model instead of returning a status. It now
+reports `too_large`, as CPLEX Community already did.
+
+### Candidate paths
+
+The old generator ran a dynamic program over (hop count, node) for the best
+worst link and the shortest total length, then dropped any path another path
+beat on both. The documentation called that exact. It was not, for three
+reasons, each now covered by `tests/test_candidate_paths.py`:
+
+- Ties were discarded. Each state kept one predecessor, so equal paths
+  through different repeaters collapsed to one. On CA9 that discarded 16,764
+  tied alternatives.
+- The program ran over walks, and a walk that revisited a node was rejected
+  only after reconstruction. On CA9, 178 of 322 (pair, hop count) states were
+  lost that way.
+- Pruning is not safe when repeaters are shared. In the test network one pair
+  can take a two-hop route through its own repeater or a three-hop route
+  through two repeaters that a second pair also needs. With a budget of two
+  repeaters the old generator keeps only the two-hop route and serves one
+  pair. Exhaustive enumeration serves both.
+
+The default generator keeps the Pareto frontier over hop count and worst
+link, with ties and one hop of slack, plus the shortest simple paths by total
+length and by summed loss (MODEL.md). It makes no claim to be exact. On 24
+small random networks, 12 seeds under two rate models, it reaches the optimum
+found by enumerating every simple path. Exhaustive enumeration cannot replace
+it on CA9, where at least one pair has more than 200,000 simple paths within
+20 hops.
+
+Rerunning at finer site spacing exposed a problem in the new generator
+itself. Its two weighted families ranked simple paths by weight and dropped
+those over the hop limit afterwards, from the first 120. The cheapest paths by
+loss use many short links. On the 40 km grid all 120 were over 20 hops, 31 to
+40 on the longest pairs, so the loss family kept nothing, and at 80 km it kept
+4 of 6 on the longest pair. The hop limit now acts inside Yen's search, and
+`tests/test_hop_limited_paths.py` checks the result against brute force on
+random graphs. At 80 km the fix changes 85 of the 552 paths: 41 added, 44
+removed.
+
+| Site spacing | Legacy paths | Default paths | Default generation time |
+|---|---|---|---|
+| 80 km | 94 | 549 | 2.4 s |
+| 40 km | 129 | 846 | 16.7 s |
+| 20 km | 162 | 1,072 | 97 s |
+
+Times are wall-clock on the development machine with other jobs running.
+Before the fix, generation at 20 km had not finished after 19 minutes.
+
+### What the fixes changed
+
+On the twelve preset CA9 solves (two hardware presets, three budgets, Eq. (2)
+and buffered rates), the default generator changes the utility of one:
+projected hardware, unlimited budget, buffered rates, up 0.505 bits with the
+same pairs served and the same sites.
+
+W6 keeps every pair and repeater count in all twelve of its cases. The mean
+fidelities under decay move by at most 0.011, and the number of pairs pushed
+to F <= 1/2 moves by one in each cell of the T2 = 112 ms table in FINDINGS.md.
+The routes themselves did change. The paper's objective cannot tell apart
+routes with the same hop count and worst link, but their waiting times
+differ: in the midrange published plan at T2 = 10 ms, with the same 12 pairs
+and 54 repeaters, median storage time over T2 went from 2.73 to 3.36. A
+waiting-time result that depends on which tie the solver returns is an
+argument for putting waiting time inside the optimisation rather than
+scoring it afterwards.
+
+### Answers to the review's questions
+
+1. **Can the old path pruning be proven exact for the full MILP?** No.
+   Repeater memory and the repeater budget are shared between pairs, and a
+   per-path dominance argument ignores them.
+
+2. **What demonstrates the failure?** The shared-repeater network in
+   `tests/test_candidate_paths.py`. The old generator keeps one route per pair
+   and serves one of two pairs. Enumerating every simple path serves both.
+
+3. **Which candidate strategy gives the best trade-off?** The default
+   generator described above. It matches exhaustive enumeration on 24 small
+   random networks and builds 549 CA9 paths in about two seconds. The price
+   is a model about five times larger, 4,454 variables instead of 809, which
+   rules out the free Gurobi and CPLEX licences on CA9 and makes each sweep
+   slower.
+
+4. **Can CA9 support exhaustive simple-path enumeration?** No. At least one
+   pair has more than 200,000 simple paths within 20 hops.
+
+5. **Which solver statuses were misclassified?** Every outcome other than
+   optimal and infeasible. A solve stopped at its time limit had no status of
+   its own and could reach the model as infeasible, and the size-limited
+   Gurobi licence raised an exception instead of reporting. None of the
+   committed result files records such a solve, apart from the 18 W4 errors
+   already excluded from that analysis.
+
+9. **Which hardware conclusions remain with defensible gate and readout
+   values?** No Bell-state measurement fidelity for T centres has been
+   published, so there is no defensible single value to substitute. The 0.946
+   readout figure was an erbium result and is now quarantined in
+   `qrp.legacy`. The model holds gate and measurement fidelity at 1.0 and
+   sweeps the combined swap quality across [0.71, 0.997] instead. Across that
+   bracket coherence stayed first (total-effect index 0.82 to 0.91) and swap
+   quality never exceeded 0.10. Those Sobol runs used the legacy path
+   generator and have not been rerun.
 
 ## What is not validated
 
